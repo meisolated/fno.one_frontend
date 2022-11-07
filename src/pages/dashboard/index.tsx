@@ -1,17 +1,47 @@
 import Head from "next/head"
+import { useState } from "react"
+import { Home as HomeIcon, Settings as SettingsIcon, Trend as TrendIcon } from "../../assets/svg"
 import css from "./style.module.css"
-
 export default function Dashboard() {
+    const [navbar, setNavbar] = useState(false)
+    const navbarState = () => {
+        setNavbar(!navbar)
+    }
+
     return (
         <>
             <Head>
                 <title>Dashboard</title>
             </Head>
             <div className={css.dashboard}>
-                <div className={css.navbar_vertical}>
-                    <div>Home</div>
+                <div className={`${css.navbar_vertical} ${navbar && css.lock_navbar_vertical}`}>
+                    <div className={css.logo}>FnO</div>
+                    <div className="divider padding-left-right-20"></div>
+                    <div className={css.navbar_vertical_items}>
+                        <div className={css.navbar_vertical_item}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <HomeIcon />
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Home</div>
+                        </div>
+                        <div className={css.navbar_vertical_item}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <TrendIcon />
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Home</div>
+                        </div>
+                        <div className="divider padding-left-right-20"></div>
+                        <div className={css.navbar_vertical_item}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <SettingsIcon />
+                            </div>
+
+                            <div className={css.navbar_vertical_item_text}>Home</div>
+                        </div>
+
+                    </div>
                 </div>
-                <div className={css.content}>
+                <div className={`${css.content} ${navbar && css.content_when_navbar_vertical_is_locked}`}>
                     <h1>Dashboard</h1>
                 </div>
             </div>

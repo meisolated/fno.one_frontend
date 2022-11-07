@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write \"{src,test}/**/*.{jsx,tsx}\""
+    "format": "prettier --write \"{src,test}/**/*.{jsx,tsx}\"",
+    "svgs": "svgr --ext tsx -d ./src/assets/svg ./src/assets/svg/src"
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
@@ -18,8 +19,9 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/node": "18.11.8",
-    "@types/react": "18.0.24",
+    "@svgr/cli": "^6.5.1",
+    "@types/node": "18.11.9",
+    "@types/react": "^18.0.25",
     "@types/react-dom": "18.0.8",
     "eslint": "8.26.0",
     "eslint-config-next": "13.0.0",
