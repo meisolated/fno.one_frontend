@@ -170,7 +170,38 @@
 .content_header {
     top: 0px;
     height: 8%;
+    width: 100%;
     background-color: var(--sidebar-color);
+    position: relative;
+    display: flex;
+
+}
+
+.content_header_left {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+    gap: 20px;
+    padding-left: 20px;
+}
+
+.content_header_right {
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: right;
+    gap: 20px;
+    padding-right: 20px;
+}
+
+.profile_image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 @keyframes fadeInLate {

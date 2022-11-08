@@ -1,16 +1,20 @@
 import Head from "next/head"
+import Image from "next/image"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import userProfilePlaceholder from "../../assets/img/user_profile_placeholder.jpg"
 import { Home as HomeIcon, Lock as LockIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
 import Home from "../../components/admin/dashboard/home"
 import Settings from "../../components/admin/dashboard/settings"
 import Trades from "../../components/admin/dashboard/trades"
-
 import css from "./style.module.css"
 export default function Dashboard(props: any) {
     const [navbar, setNavbar] = useState(true)
     const router = useRouter()
     const [active, setActive] = useState("home")
+    const [loading, setLoading] = useState(true)
+    const [user, setUser] = useState({ picture: { large: userProfilePlaceholder } })
+
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
         setNavbar(!navbar)
@@ -18,8 +22,8 @@ export default function Dashboard(props: any) {
     const onNavbarItemClick = (e: string) => {
         setActive(e)
         router.push(`/dashboard/${e}`)
-
     }
+
 
     useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
@@ -28,7 +32,18 @@ export default function Dashboard(props: any) {
             const activePage = url.split("/")[2]
             setActive(activePage)
         })
-    }, [props.query.page, router.events])
+
+        async function fetchData() {
+            const userData: any = await fetch("https://randomuser.me/api/")
+            const data = await userData.json()
+            setUser(data.results[0])
+        }
+
+        if (loading) {
+            setLoading(false)
+            fetchData()
+        }
+    }, [])
 
     return (
         <>
@@ -68,10 +83,18 @@ export default function Dashboard(props: any) {
                 </div>
                 <div className={`${css.content} ${navbar && css.content_when_navbar_vertical_is_locked}`}>
                     <div className={css.content_header}>
-                        <div className={css.content_header_title}>{active}</div>
-                        <div className={css.profile}>
-
+                        <div className={css.content_header_left}>
+                            <div className={css.content_header_title}>{active}</div>
                         </div>
+                        <div className={css.content_header_right}>
+                            <div className={css.profile_wrapper}>
+                                <div className={css.profile_image}>
+                                    <Image src={user.picture.large} alt="user-profile-image" width={40} height={40} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className={css.content_body}></div>
+
                     </div>
                     {active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "setting" ? <Settings /> : null}
                 </div>

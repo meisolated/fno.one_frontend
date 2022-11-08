@@ -3,7 +3,7 @@
 
 @font-face {
     font-family: "THICCCBOI-ThicccAF";
-    src: url("../assets/fonts/THICCCBOI-ThicccAF.woff2") format("woff2");
+    src: url("/fonts/THICCCBOI-ThicccAF.woff2") format("woff2");
     font-display: swap;
 }
 
