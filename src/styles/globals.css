@@ -8,7 +8,7 @@
 }
 
 :root {
-    --primary-color: #f00;
+    --primary-color: #3D6DFF;
     --background-color: #131113;
     --sidebar-color: #1A191A;
     --logo-font: "THICCCBOI-ThicccAF";
@@ -24,10 +24,21 @@ body {
     font-family: 'Poppins', sans-serif;
     padding: 0px;
     margin: 0px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .divider {
     width: 80%;
     height: 1px;
     background-color: #2B2B2B;
+}
+
+.margin-top-n-bottom {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }

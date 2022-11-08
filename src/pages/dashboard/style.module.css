@@ -59,13 +59,15 @@
 }
 
 .navbar_vertical_item {
+    cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     width: 90%;
     transition: all 0.3s ease-in-out;
     height: 45px;
-    gap: 10px;
+    gap: 20px;
     border-radius: 10px;
 
 }
@@ -74,7 +76,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 22px;
+    /* margin-left: 22px; */
 }
 
 .navbar_vertical_item_text {
@@ -84,15 +86,23 @@
     opacity: 0;
     font-size: 15px;
     font-weight: 500;
-
-    margin-left: 24px;
+    display: none;
 }
 
 .navbar_vertical_item:hover {
     background-color: #2D2D2D;
 }
 
+.navbar_vertical:hover .navbar_vertical_item {
+    justify-content: left;
+}
+
+.navbar_vertical:hover .navbar_vertical_item_icon {
+    margin-left: 22px;
+}
+
 .navbar_vertical:hover .navbar_vertical_item_text {
+    display: block;
     animation: fadeInLate 0.3s ease-in-out forwards;
 }
 
@@ -122,14 +132,26 @@
 
 .lock_navbar_vertical .navbar_vertical_item_text {
     display: block;
+    opacity: 1;
     font-size: 15px;
     font-weight: 500;
-    transition: all 0.3s ease-in-out;
-    margin-left: 24px;
 }
 
 .content_when_navbar_vertical_is_locked {
     width: calc(100% - 260px) !important;
+}
+
+.lock_navbar_vertical .navbar_vertical_item {
+    justify-content: left;
+}
+
+.lock_navbar_vertical .navbar_vertical_item_icon {
+    margin-left: 22px;
+}
+
+
+.active_navbar_item {
+    background-color: var(--primary-color);
 }
 
 @keyframes fadeInLate {
