@@ -1,3 +1,5 @@
 export { default as Home } from "./Home"
+export { default as Lock } from "./Lock"
 export { default as Settings } from "./Settings"
 export { default as Trend } from "./Trend"
+export { default as Unlock } from "./Unlock"

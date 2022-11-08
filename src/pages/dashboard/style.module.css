@@ -12,6 +12,7 @@
     background-color: var(--background-color);
     position: relative;
     width: calc(100% - 80px);
+    height: 100%;
     float: right;
 }
 
@@ -23,7 +24,6 @@
     width: 80px;
     left: 0;
     z-index: 9999;
-    box-shadow: 0 2px 22px 0 rgb(0 0 0 / 20%), 0 2px 30px 0 rgb(0 0 0 / 35%);
     background-color: var(--sidebar-color);
     transition: all 0.3s ease-in-out;
     display: flex;
@@ -42,11 +42,15 @@
     transition: all 0.3s ease-in-out;
     margin-top: 20px;
     margin-bottom: 20px;
+    height: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .navbar_vertical:hover .logo {
-    display: block;
     font-size: 50px;
+
 }
 
 .navbar_vertical_items {
@@ -59,16 +63,18 @@
 }
 
 .navbar_vertical_item {
+
     cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
     width: 90%;
     transition: all 0.3s ease-in-out;
     height: 45px;
     gap: 20px;
     border-radius: 10px;
+
 
 }
 
@@ -76,7 +82,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* margin-left: 22px; */
+    margin-left: 22px;
 }
 
 .navbar_vertical_item_text {
@@ -93,14 +99,6 @@
     background-color: #2D2D2D;
 }
 
-.navbar_vertical:hover .navbar_vertical_item {
-    justify-content: left;
-}
-
-.navbar_vertical:hover .navbar_vertical_item_icon {
-    margin-left: 22px;
-}
-
 .navbar_vertical:hover .navbar_vertical_item_text {
     display: block;
     animation: fadeInLate 0.3s ease-in-out forwards;
@@ -114,7 +112,6 @@
     width: 260px;
     left: 0;
     z-index: 9999;
-    box-shadow: 0 2px 22px 0 rgb(0 0 0 / 20%), 0 2px 30px 0 rgb(0 0 0 / 35%);
     background-color: var(--sidebar-color);
     transition: all 0.3s ease-in-out;
     display: flex;
@@ -152,6 +149,28 @@
 
 .active_navbar_item {
     background-color: var(--primary-color);
+}
+
+.navbar_lock_unlock {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    transition: all 0.3s ease-in-out;
+}
+
+.content_header {
+    top: 0px;
+    height: 8%;
+    background-color: var(--sidebar-color);
 }
 
 @keyframes fadeInLate {

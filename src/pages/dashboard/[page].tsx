@@ -1,21 +1,34 @@
 import Head from "next/head"
-import { useState } from "react"
-import { Home as HomeIcon, Settings as SettingsIcon, Trend as TrendIcon } from "../../assets/svg"
+import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
+import { Home as HomeIcon, Lock as LockIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
 import Home from "../../components/admin/dashboard/home"
 import Settings from "../../components/admin/dashboard/settings"
 import Trades from "../../components/admin/dashboard/trades"
 
 import css from "./style.module.css"
-export default function Dashboard() {
-    const [navbar, setNavbar] = useState(false)
+export default function Dashboard(props: any) {
+    const [navbar, setNavbar] = useState(true)
+    const router = useRouter()
     const [active, setActive] = useState("home")
     const navbarState = () => {
+        localStorage.setItem("navbar", JSON.stringify(!navbar))
         setNavbar(!navbar)
     }
     const onNavbarItemClick = (e: string) => {
-        console.log(e)
         setActive(e)
+        router.push(`/dashboard/${e}`)
+
     }
+
+    useEffect(() => {
+        setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
+        setActive(props.query.page || "home")
+        router.events.on("routeChangeStart", (url) => {
+            const activePage = url.split("/")[2]
+            setActive(activePage)
+        })
+    }, [props.query.page, router.events])
 
     return (
         <>
@@ -46,12 +59,22 @@ export default function Dashboard() {
                             <div className={css.navbar_vertical_item_icon}>
                                 <SettingsIcon />
                             </div>
-
                             <div className={css.navbar_vertical_item_text}>Settings</div>
+                        </div>
+                        <div className={css.navbar_lock_unlock} onClick={navbarState}>
+                            {navbar ? <LockIcon /> : <UnlockIcon />}
                         </div>
                     </div>
                 </div>
-                <div className={`${css.content} ${navbar && css.content_when_navbar_vertical_is_locked}`}>{active == "home" ? <Home /> : active == "trades" ? <Trades /> : <Settings />}</div>
+                <div className={`${css.content} ${navbar && css.content_when_navbar_vertical_is_locked}`}>
+                    <div className={css.content_header}>
+                        <div className={css.content_header_title}>{active}</div>
+                        <div className={css.profile}>
+
+                        </div>
+                    </div>
+                    {active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "setting" ? <Settings /> : null}
+                </div>
             </div>
         </>
     )
@@ -64,6 +87,7 @@ export const getServerSideProps = async (context: any) => {
         return {
             props: {
                 ip: ip,
+                query: context.query
             },
         }
     }
@@ -71,6 +95,7 @@ export const getServerSideProps = async (context: any) => {
         redirect: {
             destination: "/404",
             permanent: false,
+            query: context.query
         },
     }
 }
