@@ -2,12 +2,15 @@ import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import io from "socket.io-client"
 import userProfilePlaceholder from "../../assets/img/user_profile_placeholder.jpg"
 import { Home as HomeIcon, Lock as LockIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
 import Home from "../../components/admin/dashboard/home"
 import Settings from "../../components/admin/dashboard/settings"
 import Trades from "../../components/admin/dashboard/trades"
+import Loading from "../../components/loading"
 import css from "./style.module.css"
+
 export default function Dashboard(props: any) {
     const [navbar, setNavbar] = useState(true)
     const router = useRouter()
@@ -24,6 +27,41 @@ export default function Dashboard(props: any) {
         router.push(`/dashboard/${e}`)
     }
 
+    async function socketInitializer() {
+
+        const socket = io("wss://fno.one", {
+            transports: ["websocket"],
+            upgrade: false,
+            path: "/internal_api/socket.io/",
+            query: {
+                token: props.token
+
+            }
+
+        })
+
+
+        socket.on("connect", () => {
+            console.log("connected")
+        })
+
+        socket.on("disconnect", () => {
+            console.log("disconnected")
+        })
+
+        socket.on("message", (data: any) => {
+            console.log(data)
+        })
+
+        socket.on("user", (data: any) => {
+            console.log(data)
+            // setLoading(false)
+        })
+
+        socket.on("error", (err: any) => {
+            console.log(err)
+        })
+    }
 
     useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
@@ -34,16 +72,22 @@ export default function Dashboard(props: any) {
         })
 
         async function fetchData() {
+            setLoading(true)
             const userData: any = await fetch("https://randomuser.me/api/")
             const data = await userData.json()
             setUser(data.results[0])
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            setLoading(false)
         }
+        socketInitializer()
 
         if (loading) {
             setLoading(false)
             fetchData()
         }
     }, [])
+
+    // if (loading) return <Loading />
 
     return (
         <>
@@ -93,10 +137,10 @@ export default function Dashboard(props: any) {
                                 </div>
                             </div>
                         </div>
-                        <div className={css.content_body}></div>
-
                     </div>
-                    {active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "setting" ? <Settings /> : null}
+                    <div className={css.content_body}>
+                        {loading ? <Loading /> : active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "settings" ? <Settings /> : null}
+                    </div>
                 </div>
             </div>
         </>
@@ -105,20 +149,33 @@ export default function Dashboard(props: any) {
 
 export const getServerSideProps = async (context: any) => {
     const forwarded = context.req.headers["x-real-ip"]
+    const token = context.req.cookies?.authorization_token || null
     const ip = forwarded ? forwarded.split(/, /)[0] : context.req.connection.remoteAddress
     if (ip === "103.62.93.150" || ip === "::ffff:127.0.0.1") {
-        return {
-            props: {
-                ip: ip,
-                query: context.query
-            },
+        if (!token) {
+            return {
+                redirect: {
+                    destination: "/api/login",
+                    permanent: false
+                }
+            }
         }
+        else {
+            return {
+                props: {
+                    ip: ip,
+                    query: context.query,
+                    token: token
+                },
+            }
+        }
+
     }
     return {
         redirect: {
             destination: "/404",
             permanent: false,
-            query: context.query
+            query: context.query,
         },
     }
 }

@@ -1,11 +1,12 @@
 import css from "./style.module.css"
+// https://codepen.io/thebabydino/pen/VNgewR
+// https://codepen.io/BenjaminH/pen/ZNBEPm
 export default function Loading(props: any) {
     return (
-        <div className={css.loading}>
-            <div className={css.loading_content}>
-                <div className={css.loading_content_text}>Loading...</div>
-                <div className={css.loading_content_spinner}>
-                    <div className={css.loading_content_spinner_circle}></div>
+        <div className={css.loading_wrapper}>
+            <div className={css.pswp__preloader__icn}>
+                <div className={css.pswp__preloader__cut}>
+                    <div className={css.pswp__preloader__donut}></div>
                 </div>
             </div>
         </div>
