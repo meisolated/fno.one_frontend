@@ -1,5 +1,19 @@
 import axios from "axios"
-export default function handler(req: any, res: any) {
-    axios.get("http://localhost:3011/accept_access", { params: req.query })
-    res.status(200).json({ status: "Not Found", code: 404 })
+import { setCookie } from "cookies-next"
+
+export default async function handler(req: any, res: any) {
+    const cookies = req.cookies
+    const response = await axios.get("http://localhost:3011/accept_access", { params: { ...req.query, cookies } })
+    if (response.data.code === 200) {
+        console.log("callback", response.data)
+        if (cookies["fno.one"]) {
+            return await res.redirect("https://fno.one")
+        } else {
+            setCookie("fno.one", response.data.cookie, { req, res, maxAge: response.data.maxAge, path: "/" })
+            return await res.redirect("https://fno.one")
+        }
+    }
+    else {
+        res.send({ code: 500, message: "Something went wrong " + response.data.message })
+    }
 }
