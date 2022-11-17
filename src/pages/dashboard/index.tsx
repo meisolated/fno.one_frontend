@@ -1,5 +1,6 @@
 import { useRouter } from "next/router"
 import { useEffect } from "react"
+import Loading from "../../components/loading"
 
 export default function Dashboard(props: any) {
     const router = useRouter()
@@ -8,8 +9,8 @@ export default function Dashboard(props: any) {
     }, [])
 
     return (
-        <>
-            <div>What you&rsquo;re looking for isn&rsquo;t here</div>
-        </>
+        <div style={{ width: "100%", height: "100%", position: "absolute", alignItems: "center", textAlign: "center" }}>
+            <Loading />
+        </div>
     )
 }

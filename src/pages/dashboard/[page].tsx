@@ -28,18 +28,14 @@ export default function Dashboard(props: any) {
     }
 
     async function socketInitializer() {
-
         const socket = io("wss://fno.one", {
             transports: ["websocket"],
             upgrade: false,
             path: "/internal_api/socket.io/",
             query: {
-                token: props.token
-
-            }
-
+                token: props.token,
+            },
         })
-
 
         socket.on("connect", () => {
             console.log("connected")
@@ -49,17 +45,14 @@ export default function Dashboard(props: any) {
             console.log("disconnected")
         })
 
-        socket.on("message", (data: any) => {
-            console.log(data)
-        })
-
-        socket.on("user", (data: any) => {
-            console.log(data)
-            // setLoading(false)
-        })
-
         socket.on("error", (err: any) => {
             console.log(err)
+        })
+        setInterval(() => {
+            socket.emit("ping", "ping")
+        }, 6000)
+        socket.on("pong", (data: any) => {
+            console.log(data)
         })
     }
 
@@ -138,9 +131,7 @@ export default function Dashboard(props: any) {
                             </div>
                         </div>
                     </div>
-                    <div className={css.content_body}>
-                        {loading ? <Loading /> : active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "settings" ? <Settings /> : null}
-                    </div>
+                    <div className={css.content_body}>{loading ? <Loading /> : active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "settings" ? <Settings /> : null}</div>
                 </div>
             </div>
         </>
@@ -149,27 +140,25 @@ export default function Dashboard(props: any) {
 
 export const getServerSideProps = async (context: any) => {
     const forwarded = context.req.headers["x-real-ip"]
-    const token = context.req.cookies?.authorization_token || null
+    const token = context.req.cookies["fno.one"] || null
     const ip = forwarded ? forwarded.split(/, /)[0] : context.req.connection.remoteAddress
     if (ip === "103.62.93.150" || ip === "::ffff:127.0.0.1") {
         if (!token) {
             return {
                 redirect: {
                     destination: "/api/login",
-                    permanent: false
-                }
+                    permanent: false,
+                },
             }
-        }
-        else {
+        } else {
             return {
                 props: {
                     ip: ip,
                     query: context.query,
-                    token: token
+                    token: token,
                 },
             }
         }
-
     }
     return {
         redirect: {
