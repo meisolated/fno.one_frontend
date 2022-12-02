@@ -15,6 +15,10 @@ export default function Error(props: any) {
             title: "Page Not Found",
             description: "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
         },
+        userNotFound: {
+            title: "User Not Found",
+            description: "The user you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+        },
 
     }
     const err = props.query.error || "404"

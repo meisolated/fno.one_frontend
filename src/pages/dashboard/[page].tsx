@@ -5,9 +5,9 @@ import { useEffect, useState } from "react"
 import io from "socket.io-client"
 import userProfilePlaceholder from "../../assets/img/user_profile_placeholder.jpg"
 import { Home as HomeIcon, Lock as LockIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
-import Home from "../../components/admin/dashboard/home"
-import Settings from "../../components/admin/dashboard/settings"
-import Trades from "../../components/admin/dashboard/trades"
+import Home from "../../components/dashboard/home"
+import Settings from "../../components/dashboard/settings"
+import Trades from "../../components/dashboard/trades"
 import Loading from "../../components/loading"
 import css from "./style.module.css"
 
@@ -33,18 +33,15 @@ export default function Dashboard(props: any) {
             upgrade: false,
             path: "/internal_api/socket.io/",
             query: {
-                token: props.token,
+                sessionId: props.token,
             },
         })
-
         socket.on("connect", () => {
             console.log("connected")
         })
-
         socket.on("disconnect", () => {
             console.log("disconnected")
         })
-
         socket.on("error", (err: any) => {
             console.log(err)
         })
@@ -54,6 +51,13 @@ export default function Dashboard(props: any) {
         socket.on("pong", (data: any) => {
             console.log(data)
         })
+        socket.emit("subscribeOrderUpdate", { sessionId: props.token })
+        socket.on("orderUpdate", (data: any) => {
+            const parsedData = JSON.parse(data)
+            console.log(parsedData)
+        })
+
+
     }
 
     useEffect(() => {
@@ -70,7 +74,11 @@ export default function Dashboard(props: any) {
             const data = await userData.json()
             setUser(data.results[0])
             await new Promise((resolve) => setTimeout(resolve, 2000))
+            const _userData = await fetch("/internal_api/user")
+            const _data = await _userData.json()
+            console.log(_data)
             setLoading(false)
+
         }
         socketInitializer()
 
