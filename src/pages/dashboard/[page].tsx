@@ -4,8 +4,10 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import io from "socket.io-client"
 import userProfilePlaceholder from "../../assets/img/user_profile_placeholder.jpg"
-import { Home as HomeIcon, Lock as LockIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
+import { Health as PositionsIcon, Home as HomeIcon, Lock as LockIcon, ReceiptItem as ReceiptItemIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
 import Home from "../../components/dashboard/home"
+import Orders from "../../components/dashboard/orders"
+import Positions from "../../components/dashboard/positions"
 import Settings from "../../components/dashboard/settings"
 import Trades from "../../components/dashboard/trades"
 import Loading from "../../components/loading"
@@ -16,7 +18,7 @@ export default function Dashboard(props: any) {
     const router = useRouter()
     const [active, setActive] = useState("home")
     const [loading, setLoading] = useState(true)
-    const [user, setUser] = useState({ picture: { large: userProfilePlaceholder } })
+    const [user, setUser] = useState({ picture: userProfilePlaceholder })
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -70,13 +72,9 @@ export default function Dashboard(props: any) {
 
         async function fetchData() {
             setLoading(true)
-            const userData: any = await fetch("https://randomuser.me/api/")
-            const data = await userData.json()
-            setUser(data.results[0])
-            await new Promise((resolve) => setTimeout(resolve, 2000))
             const _userData = await fetch("/internal_api/user")
             const _data = await _userData.json()
-            console.log(_data)
+            setUser({ ...user, picture: _data.data.image })
             setLoading(false)
 
         }
@@ -114,6 +112,18 @@ export default function Dashboard(props: any) {
                             </div>
                             <div className={css.navbar_vertical_item_text}>Trades</div>
                         </div>
+                        <div className={`${css.navbar_vertical_item} ${active == "orders" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("orders")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <ReceiptItemIcon />
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Orders</div>
+                        </div>
+                        <div className={`${css.navbar_vertical_item} ${active == "positions" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("positions")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <PositionsIcon />
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Positions</div>
+                        </div>
                         <div className="divider margin-top-n-bottom" />
                         <div className={`${css.navbar_vertical_item} ${active == "settings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("settings")}>
                             <div className={css.navbar_vertical_item_icon}>
@@ -134,12 +144,19 @@ export default function Dashboard(props: any) {
                         <div className={css.content_header_right}>
                             <div className={css.profile_wrapper}>
                                 <div className={css.profile_image}>
-                                    <Image src={user.picture.large} alt="user-profile-image" width={40} height={40} />
+                                    <Image src={user.picture} alt="user-profile-image" width={40} height={40} />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className={css.content_body}>{loading ? <Loading /> : active == "home" ? <Home /> : active == "trades" ? <Trades /> : active == "settings" ? <Settings /> : null}</div>
+                    <div className={css.content_body}>
+                        {loading && <Loading />}
+                        {active == "home" && <Home />}
+                        {active == "trades" && <Trades />}
+                        {active == "orders" && <Orders />}
+                        {active == "positions" && <Positions />}
+                        {active == "settings" && <Settings />}
+                    </div>
                 </div>
             </div>
         </>

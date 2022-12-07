@@ -1,5 +1,7 @@
+export { default as Health } from "./Health"
 export { default as Home } from "./Home"
 export { default as Lock } from "./Lock"
+export { default as ReceiptItem } from "./ReceiptItem"
 export { default as Settings } from "./Settings"
 export { default as Trend } from "./Trend"
 export { default as Unlock } from "./Unlock"
