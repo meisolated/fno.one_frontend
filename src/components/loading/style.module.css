@@ -1,0 +1,130 @@
+.loading_wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color);
+    z-index: 1001;
+}
+
+.pswp__preloader__icn {
+    opacity: 1;
+    width: 20px;
+    height: 20px;
+    -webkit-animation: clockwise 500ms linear infinite;
+    animation: clockwise 500ms linear infinite;
+}
+
+.pswp__preloader__cut {
+    position: relative;
+    width: 7px;
+    height: 20px;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.pswp__preloader__donut--fake {
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    border: 2px solid red;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: none;
+    margin: 0;
+}
+
+.pswp__preloader__donut {
+    box-sizing: border-box;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #FFF;
+    border-radius: 50%;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: none;
+    margin: 0;
+    -webkit-animation: donut-rotate 1000ms cubic-bezier(.4, 0, .22, 1) infinite;
+    animation: donut-rotate 1000ms cubic-bezier(.4, 0, .22, 1) infinite;
+
+}
+
+
+@-webkit-keyframes clockwise {
+    0% {
+        -webkit-transform: rotate(0deg)
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg)
+    }
+}
+
+@keyframes clockwise {
+    0% {
+        transform: rotate(0deg)
+    }
+
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
+@-webkit-keyframes donut-rotate {
+    0% {
+        -webkit-transform: rotate(0)
+    }
+
+    50% {
+        -webkit-transform: rotate(-140deg)
+    }
+
+    100% {
+        -webkit-transform: rotate(0)
+    }
+}
+
+@keyframes donut-rotate {
+    0% {
+        transform: rotate(0)
+    }
+
+    50% {
+        transform: rotate(-140deg)
+    }
+
+    100% {
+        transform: rotate(0)
+    }
+}
+
+/* .loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: calc(4px - 3em)-3em;
+    border: solid 0 #fff;
+    border-width: 8px 0px 0;
+    padding: calc(3em - 4px) 3em;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 5px #fff;
+    filter: blur(2px) drop-shadow(0 0 3px cyan) drop-shadow(0 0 5px lightskyblue) drop-shadow(0 0 7px skyblue);
+    animation: a 1s linear infinite;
+    width: 50px;
+    height: 50px;
+}
+
+@keyframes a {
+    to {
+        transform: rotate(1turn);
+    }
+} */

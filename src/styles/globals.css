@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+
+@font-face {
+    font-family: "THICCCBOI-ThicccAF";
+    src: url("/fonts/THICCCBOI-ThicccAF.woff2") format("woff2");
+    font-display: swap;
+}
+
+:root {
+    --primary-color: #3D6DFF;
+    --background-color: #131113;
+    --sidebar-color: #1A191A;
+    --logo-font: "THICCCBOI-ThicccAF";
+}
+
+body {
+    padding: 0px;
+    margin: 0px;
+    background-color: var(--background-color);
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+    padding: 0px;
+    margin: 0px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.divider {
+    width: 80%;
+    height: 1px;
+    background-color: #2B2B2B;
+}
+
+.margin-top-n-bottom {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
