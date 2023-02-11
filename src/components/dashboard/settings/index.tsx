@@ -1,5 +1,14 @@
 import Head from "next/head"
-export default function Settings() {
+import { useEffect } from "react"
+
+interface Props {
+    user: any
+}
+
+export default function Settings(props: Props) {
+    useEffect(() => {
+        console.log(props.user)
+    }, [])
     return (
         <div>
             <Head>

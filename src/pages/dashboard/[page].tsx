@@ -1,7 +1,8 @@
+import { Avatar, Grid } from "@nextui-org/react"
 import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import io from "socket.io-client"
 import userProfilePlaceholder from "../../assets/img/user_profile_placeholder.jpg"
 import { Health as PositionsIcon, Home as HomeIcon, Lock as LockIcon, ReceiptItem as ReceiptItemIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
@@ -18,7 +19,10 @@ export default function Dashboard(props: any) {
     const router = useRouter()
     const [active, setActive] = useState("home")
     const [loading, setLoading] = useState(true)
-    const [user, setUser] = useState({ picture: userProfilePlaceholder })
+    const [user, setUser] = useState({ picture: "/anime-girl.gif" })
+    const [logs, setLogs] = useState<string>("")
+    const [marketData, setMarketData] = useState<any>({})
+    const [marketDataSocketConnected, setMarketDataSocketConnected] = useState(false)
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -29,38 +33,84 @@ export default function Dashboard(props: any) {
         router.push(`/dashboard/${e}`)
     }
 
+    const playSound = () => {
+        const audio = new Audio("https://fno.one/mp3/ding.mp3")
+        audio.play()
+
+    }
     async function socketInitializer() {
-        const socket = io("wss://fno.one", {
+        // Public Socket
+        const publicSocket = io("wss://fno.one/public", {
             transports: ["websocket"],
             upgrade: false,
-            path: "/internal_api/socket.io/",
+            path: "/socket",
             query: {
                 sessionId: props.token,
             },
         })
-        socket.on("connect", () => {
+        publicSocket.on("connect", () => {
             console.log("connected")
         })
-        socket.on("disconnect", () => {
+        publicSocket.emit("subscribeMarketDataUpdate", { sessionId: props.token })
+        publicSocket.on("marketDataUpdate", (data: any) => {
+            const parsedData = JSON.parse(data)
+            const symbol = parsedData.symbol
+            if (!marketDataSocketConnected) {
+                setMarketDataSocketConnected(true)
+                setLogs((orderUpdates) => `
+                ${orderUpdates} <br/> ${parsedData.message}
+                `)
+            } else {
+                setMarketData((marketData: any) => {
+                    return { ...marketData, [symbol]: parsedData }
+                })
+            }
+
+
+        })
+
+        // User Socket
+        const userSocket = io("wss://fno.one/user", {
+            transports: ["websocket"],
+            upgrade: false,
+            path: "/socket",
+            query: {
+                sessionId: props.token,
+            },
+        })
+        userSocket.on("connect", () => {
+            console.log("connected")
+        })
+        userSocket.on("disconnect", () => {
             console.log("disconnected")
         })
-        socket.on("error", (err: any) => {
+        userSocket.on("error", (err: any) => {
             console.log(err)
         })
         setInterval(() => {
-            socket.emit("ping", "ping")
+            userSocket.emit("ping", "ping")
         }, 6000)
-        socket.on("pong", (data: any) => {
+        userSocket.on("pong", (data: any) => {
             console.log(data)
         })
-        socket.emit("subscribeOrderUpdate", { sessionId: props.token })
-        socket.on("orderUpdate", (data: any) => {
+        userSocket.emit("subscribeOrderUpdate", { sessionId: props.token })
+        userSocket.on("orderUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
             console.log(parsedData)
+            const message = parsedData.message
+            setLogs((orderUpdates) => `
+            ${orderUpdates} <br/> ${message}
+            `)
+            if (message.includes("CONFIRMED")) {
+                playSound()
+            }
+
         })
-
-
     }
+
+    useEffect(() => {
+        socketInitializer()
+    }, [])
 
     useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
@@ -74,11 +124,9 @@ export default function Dashboard(props: any) {
             setLoading(true)
             const _userData = await fetch("/internal_api/user")
             const _data = await _userData.json()
-            setUser({ ...user, picture: _data.data.image })
+            // setUser({ picture: _data.data.image })
             setLoading(false)
-
         }
-        socketInitializer()
 
         if (loading) {
             setLoading(false)
@@ -141,11 +189,20 @@ export default function Dashboard(props: any) {
                         <div className={css.content_header_left}>
                             <div className={css.content_header_title}>{active}</div>
                         </div>
+
                         <div className={css.content_header_right}>
+                            {marketData["NSE:NIFTYBANK-INDEX"] && <div dangerouslySetInnerHTML={{ __html: marketData["NSE:NIFTYBANK-INDEX"].lp }}></div>}
+                            {/* <Grid>
+                                <Avatar size="xl" src={user.picture} color="gradient" bordered />
+                            </Grid> */}
+
                             <div className={css.profile_wrapper}>
-                                <div className={css.profile_image}>
-                                    <Image src={user.picture} alt="user-profile-image" width={40} height={40} />
+                                <div className={css.circle}>
+                                    <div className={css.profile_image}>
+                                        <Image src={user.picture} alt="user-profile-image" width={60} height={60} />
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -155,7 +212,10 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "settings" && <Settings />}
+                        {active == "settings" && <Settings user={user} />}
+                        {/* <button onClick={() => requestUserNotificationPermission()}>Request Notification Permission</button> */}
+                        {/* <button onClick={() => somethingIDK()}>Something IDK</button> */}
+                        <div dangerouslySetInnerHTML={{ __html: logs }}></div>
                     </div>
                 </div>
             </div>

@@ -19,11 +19,10 @@ export default function Error(props: any) {
             title: "User Not Found",
             description: "The user you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
         },
-
     }
     const err = props.query.error || "404"
     //@ts-ignore
-    const error = (errorsList[err] !== undefined) ? errorsList[err] : errorsList["404"]
+    const error = errorsList[err] !== undefined ? errorsList[err] : errorsList["404"]
     return (
         <div>
             <Head>
@@ -33,7 +32,6 @@ export default function Error(props: any) {
                 <div className={css.error_wrapper}>
                     <h1>{error.title}</h1>
                     <h2>{error.description}</h2>
-
                 </div>
             </div>
         </div>
@@ -44,7 +42,7 @@ export async function getServerSideProps(context: any) {
     const query = context.query
     return {
         props: {
-            query
-        }
+            query,
+        },
     }
 }

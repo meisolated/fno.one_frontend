@@ -1,6 +1,5 @@
 export default function Auth(props: any) {
     return <></>
-
 }
 
 export async function getServerSideProps(context: any) {
@@ -25,5 +24,4 @@ export async function getServerSideProps(context: any) {
             }
         }
     }
-
 }
