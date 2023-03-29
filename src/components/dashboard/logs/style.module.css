@@ -1,0 +1,7 @@
+.logsList {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+    padding: 0 1rem;
+}

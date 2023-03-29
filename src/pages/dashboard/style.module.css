@@ -202,7 +202,6 @@
 .profile_image {
     width: 100%;
     height: 100%;
-
 }
 
 .circle {
@@ -269,13 +268,14 @@
     }
 }
 
-.content_body {
+.contentBody {
     top: 8%;
     bottom: 0px;
     right: 0px;
     position: absolute;
     width: 100%;
-    height: 92%;
+    height: fit-content;
+    background-color: var(--background-color);
 }
 
 @keyframes fadeInLate {
