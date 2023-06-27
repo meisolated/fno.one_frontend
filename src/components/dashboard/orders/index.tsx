@@ -7,10 +7,13 @@ import css from "./style.module.css"
 export default function Orders() {
     const [OrdersList, setOrdersList] = useState([])
     const [isLoading, setLoading] = useState(false)
+    const [error, setError] = useState<String>("")
     useEffect(() => {
         const getOrders = async () => {
             setLoading(true)
             const Orders = await fetch("https://fno.one/api/orders")
+            // if error 
+            Orders.ok ? console.log("Orders fetched") : setError("Orders fetch failed")
             const OrdersJson = await Orders.json()
             setOrdersList(OrdersJson.orders)
             console.log(OrdersJson)
@@ -53,13 +56,11 @@ export default function Orders() {
                                 ))}
                             </Table.Body>
                         </Table>
-
                     )}
+                    {error && <p>{error}</p>}
                 </div>
             </div>
-
             {/* {!isLoading && <List columns={["orderDateTime", "side", "segment", "tradedQty", "tradePrice", "tradeValue", "symbol"]} rows={OrdersList} />} */}
-
         </div>
     )
 }

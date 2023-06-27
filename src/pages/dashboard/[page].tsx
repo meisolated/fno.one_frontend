@@ -3,9 +3,9 @@ import Image from "next/image"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import io from "socket.io-client"
-import { Health as PositionsIcon, Home as HomeIcon, Lock as LockIcon, ReceiptItem as ReceiptItemIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
 import Home from "../../components/dashboard/home"
 import Logs from "../../components/dashboard/logs"
+import OptionChain from "../../components/dashboard/optionChain"
 import Orders from "../../components/dashboard/orders"
 import Positions from "../../components/dashboard/positions"
 import Settings from "../../components/dashboard/settings"
@@ -60,6 +60,8 @@ export default function Dashboard(props: any) {
         publicSocket.on("marketDataUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
             const symbol = parsedData.symbol
+            // console.log(parsedData)
+            console.log(parsedData)
             setMarketData((marketData: any) => {
                 return { ...marketData, [symbol]: parsedData }
             })
@@ -109,7 +111,6 @@ export default function Dashboard(props: any) {
         userSocket.emit("subscribeOrderUpdate", { sessionId: props.token })
         userSocket.on("orderUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
-            console.log(parsedData)
             const message = parsedData.message
             setLogs((orderUpdates) => {
                 return [...orderUpdates, message]
@@ -165,7 +166,12 @@ export default function Dashboard(props: any) {
                             </div>
                             <div className={css.navbar_vertical_item_text}>Home</div>
                         </div>
-
+                        <div className={`${css.navbar_vertical_item} ${active == "positions" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("positions")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded ">work</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Positions</div>
+                        </div>
                         <div className={`${css.navbar_vertical_item} ${active == "trades" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("trades")}>
                             <div className={css.navbar_vertical_item_icon}>
                                 <div className="material-symbols-rounded ">trending_up</div>
@@ -178,11 +184,13 @@ export default function Dashboard(props: any) {
                             </div>
                             <div className={css.navbar_vertical_item_text}>Orders</div>
                         </div>
-                        <div className={`${css.navbar_vertical_item} ${active == "positions" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("positions")}>
+
+                        <div className="divider margin-top-n-bottom" />
+                        <div className={`${css.navbar_vertical_item} ${active == "option_chain" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("option_chain")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <div className="material-symbols-rounded ">work</div>
+                                <div className="material-symbols-rounded ">link</div>
                             </div>
-                            <div className={css.navbar_vertical_item_text}>Positions</div>
+                            <div className={css.navbar_vertical_item_text}>Option Chain</div>
                         </div>
                         <div className="divider margin-top-n-bottom" />
                         <div className={`${css.navbar_vertical_item} ${active == "settings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("settings")}>
@@ -198,8 +206,7 @@ export default function Dashboard(props: any) {
                             <div className={css.navbar_vertical_item_text}>Logs</div>
                         </div>
                         <div className={css.navbar_lock_unlock} onClick={navbarState}>
-                            {navbar ? <div className="material-symbols-rounded">lock
-                            </div> : <div className="material-symbols-rounded">lock_open</div>}
+                            {navbar ? <div className="material-symbols-rounded">lock</div> : <div className="material-symbols-rounded">lock_open</div>}
                         </div>
                     </div>
                 </div>
@@ -229,6 +236,7 @@ export default function Dashboard(props: any) {
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
                         {active == "settings" && <Settings user={user} />}
+                        {active == "option_chain" && <OptionChain marketData={marketData} />}
                         {active == "logs" && <Logs logs={logs} />}
                         {/* <button onClick={() => requestUserNotificationPermission()}>Request Notification Permission</button> */}
                         {/* <button onClick={() => somethingIDK()}>Something IDK</button> */}

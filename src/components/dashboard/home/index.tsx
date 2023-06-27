@@ -6,6 +6,8 @@ export default function Home() {
                 <title>Home</title>
             </Head>
             <h1>Home</h1>
+            {/* Account Info  */}
+            {/* Recent Transactions */}
         </div>
     )
 }

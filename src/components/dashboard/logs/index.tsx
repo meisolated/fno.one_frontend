@@ -6,14 +6,14 @@ interface Props {
 }
 
 export default function Logs(props: Props) {
-    useEffect(() => { }, [])
+    useEffect(() => {}, [])
     return (
         <div>
             <Head>
                 <title>Logs</title>
             </Head>
             <div className="container">
-                <div className={css.logsList} >
+                <div className={css.logsList}>
                     {props.logs.map((log: any, index: number) => {
                         return (
                             <div key={index}>

@@ -4,21 +4,20 @@ import { useEffect, useState } from "react"
 import { StyledBadge } from "../../../components/dashboard/items/StyledBadge"
 import css from "./style.module.css"
 export default function Trades() {
-
     const [tradesList, setTradesList] = useState([])
     const [isLoading, setLoading] = useState(false)
     const [tradesPAndL, setTradesPAndL] = useState(0)
     const [pagination, setPagination] = useState<Boolean>(false)
+    const [error, setError] = useState<String>("")
 
     const tradesPAndLCalculation = (list: any) => {
         let allBought = 0
         let allSold = 0
         list.filter((trade: any) => {
             if (trade.side === 1) {
-                return allBought += trade.tradeValue
-            }
-            else if (trade.side === -1) {
-                return allSold += trade.tradeValue
+                return (allBought += trade.tradeValue)
+            } else if (trade.side === -1) {
+                return (allSold += trade.tradeValue)
             }
         })
         return allSold - allBought
@@ -27,6 +26,7 @@ export default function Trades() {
         const getTrades = async () => {
             setLoading(true)
             const trades = await fetch("https://fno.one/api/trades")
+            trades.ok ? console.log("trades fetched") : setError("trades fetch failed")
             const tradesJson = await trades.json()
             const _tradesList = tradesJson.trades
             setTradesList(_tradesList)
@@ -87,6 +87,7 @@ export default function Trades() {
                     {pagination && <Table.Pagination shadow noMargin align="center" rowsPerPage={10} onPageChange={(page) => console.log({ page })} />}
                 </Table>
             )}
+            {error && <h1>{error}</h1>}
         </div>
     )
 }
