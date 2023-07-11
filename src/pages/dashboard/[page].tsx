@@ -3,9 +3,9 @@ import Image from "next/image"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import io from "socket.io-client"
-import userProfilePlaceholder from "../../assets/img/user_profile_placeholder.jpg"
-import { Health as PositionsIcon, Home as HomeIcon, Lock as LockIcon, ReceiptItem as ReceiptItemIcon, Settings as SettingsIcon, Trend as TrendIcon, Unlock as UnlockIcon } from "../../assets/svg"
 import Home from "../../components/dashboard/home"
+import Logs from "../../components/dashboard/logs"
+import OptionChain from "../../components/dashboard/optionChain"
 import Orders from "../../components/dashboard/orders"
 import Positions from "../../components/dashboard/positions"
 import Settings from "../../components/dashboard/settings"
@@ -18,7 +18,10 @@ export default function Dashboard(props: any) {
     const router = useRouter()
     const [active, setActive] = useState("home")
     const [loading, setLoading] = useState(true)
-    const [user, setUser] = useState({ picture: userProfilePlaceholder })
+    const [user, setUser] = useState({ picture: "/anime-girl.gif" })
+    const [logs, setLogs] = useState<Array<string>>([])
+    const [marketData, setMarketData] = useState<any>({})
+    const [marketDataSocketConnected, setMarketDataSocketConnected] = useState(false)
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -29,38 +32,98 @@ export default function Dashboard(props: any) {
         router.push(`/dashboard/${e}`)
     }
 
+    const playSound = () => {
+        const audio = new Audio("https://fno.one/mp3/ding.mp3")
+        audio.play()
+    }
     async function socketInitializer() {
-        const socket = io("wss://fno.one", {
+        // Public Socket
+        const publicSocket = io("wss://fno.one/public", {
             transports: ["websocket"],
             upgrade: false,
-            path: "/internal_api/socket.io/",
+            path: "/socket",
             query: {
                 sessionId: props.token,
             },
         })
-        socket.on("connect", () => {
-            console.log("connected")
+        publicSocket.on("connect", () => {
+            setLogs((logs: any) => {
+                return [...logs, "Public Socket Connected"]
+            })
         })
-        socket.on("disconnect", () => {
-            console.log("disconnected")
+        publicSocket.on("disconnect", () => {
+            setLogs((logs: any) => {
+                return [...logs, "Public Socket Disconnected"]
+            })
         })
-        socket.on("error", (err: any) => {
-            console.log(err)
+        publicSocket.emit("subscribeMarketDataUpdate", { sessionId: props.token })
+        publicSocket.on("marketDataUpdate", (data: any) => {
+            const parsedData = JSON.parse(data)
+            const symbol = parsedData.symbol
+            // console.log(parsedData)
+            console.log(parsedData)
+            setMarketData((marketData: any) => {
+                return { ...marketData, [symbol]: parsedData }
+            })
+            // if (!marketDataSocketConnected) {
+            //     setMarketDataSocketConnected(() => true)
+            //     console.log("Market Data Socket Connected")
+
+            //     console.log(marketDataSocketConnected)
+            //     setLogs((logs: any) => {
+            //         return [...logs, "Market Data Socket Connected"]
+            //     })
+            // } else {
+
+            // }
+        })
+
+        // User Socket
+        const userSocket = io("wss://fno.one/user", {
+            transports: ["websocket"],
+            upgrade: false,
+            path: "/socket",
+            query: {
+                sessionId: props.token,
+            },
+        })
+        userSocket.on("connect", () => {
+            setLogs((logs: any) => {
+                return [...logs, "User Socket Connected"]
+            })
+        })
+        userSocket.on("disconnect", () => {
+            setLogs((logs: any) => {
+                return [...logs, "User Socket Disconnected"]
+            })
+        })
+        userSocket.on("error", (err: any) => {
+            setLogs((logs: any) => {
+                return [...logs, "User Socket Error: " + err]
+            })
         })
         setInterval(() => {
-            socket.emit("ping", "ping")
+            userSocket.emit("ping", "ping")
         }, 6000)
-        socket.on("pong", (data: any) => {
-            console.log(data)
+        userSocket.on("pong", (data: any) => {
+            return
         })
-        socket.emit("subscribeOrderUpdate", { sessionId: props.token })
-        socket.on("orderUpdate", (data: any) => {
+        userSocket.emit("subscribeOrderUpdate", { sessionId: props.token })
+        userSocket.on("orderUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
-            console.log(parsedData)
+            const message = parsedData.message
+            setLogs((orderUpdates) => {
+                return [...orderUpdates, message]
+            })
+            if (message.includes("CONFIRMED")) {
+                playSound()
+            }
         })
-
-
     }
+
+    useEffect(() => {
+        socketInitializer()
+    }, [])
 
     useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
@@ -74,18 +137,15 @@ export default function Dashboard(props: any) {
             setLoading(true)
             const _userData = await fetch("/internal_api/user")
             const _data = await _userData.json()
-            setUser({ ...user, picture: _data.data.image })
+            // setUser({ picture: _data.data.image })
             setLoading(false)
-
         }
-        socketInitializer()
 
         if (loading) {
             setLoading(false)
             fetchData()
         }
     }, [])
-
     // if (loading) return <Loading />
 
     return (
@@ -102,37 +162,51 @@ export default function Dashboard(props: any) {
                     <div className={css.navbar_vertical_items}>
                         <div className={`${css.navbar_vertical_item} ${active == "home" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("home")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <HomeIcon />
+                                <div className="material-symbols-rounded ">home</div>
                             </div>
                             <div className={css.navbar_vertical_item_text}>Home</div>
                         </div>
+                        <div className={`${css.navbar_vertical_item} ${active == "positions" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("positions")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded ">work</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Positions</div>
+                        </div>
                         <div className={`${css.navbar_vertical_item} ${active == "trades" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("trades")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <TrendIcon />
+                                <div className="material-symbols-rounded ">trending_up</div>
                             </div>
                             <div className={css.navbar_vertical_item_text}>Trades</div>
                         </div>
                         <div className={`${css.navbar_vertical_item} ${active == "orders" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("orders")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <ReceiptItemIcon />
+                                <div className="material-symbols-rounded ">grading</div>
                             </div>
                             <div className={css.navbar_vertical_item_text}>Orders</div>
                         </div>
-                        <div className={`${css.navbar_vertical_item} ${active == "positions" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("positions")}>
+
+                        <div className="divider margin-top-n-bottom" />
+                        <div className={`${css.navbar_vertical_item} ${active == "option_chain" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("option_chain")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <PositionsIcon />
+                                <div className="material-symbols-rounded ">link</div>
                             </div>
-                            <div className={css.navbar_vertical_item_text}>Positions</div>
+                            <div className={css.navbar_vertical_item_text}>Option Chain</div>
                         </div>
                         <div className="divider margin-top-n-bottom" />
                         <div className={`${css.navbar_vertical_item} ${active == "settings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("settings")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <SettingsIcon />
+                                <div className="material-symbols-rounded">settings</div>
                             </div>
                             <div className={css.navbar_vertical_item_text}>Settings</div>
                         </div>
+                        <div className={`${css.navbar_vertical_item} ${active == "logs" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("logs")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded">data_object</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Logs</div>
+                        </div>
                         <div className={css.navbar_lock_unlock} onClick={navbarState}>
-                            {navbar ? <LockIcon /> : <UnlockIcon />}
+                            {navbar ? <div className="material-symbols-rounded">lock</div> : <div className="material-symbols-rounded">lock_open</div>}
                         </div>
                     </div>
                 </div>
@@ -141,21 +215,31 @@ export default function Dashboard(props: any) {
                         <div className={css.content_header_left}>
                             <div className={css.content_header_title}>{active}</div>
                         </div>
+
                         <div className={css.content_header_right}>
+                            {marketData["NSE:NIFTYBANK-INDEX"] && <div dangerouslySetInnerHTML={{ __html: marketData["NSE:NIFTYBANK-INDEX"].lp }}></div>}
+                            {/* <Grid>
+                                <Avatar size="xl" src={user.picture} color="gradient" bordered />
+                            </Grid> */}
+
                             <div className={css.profile_wrapper}>
-                                <div className={css.profile_image}>
-                                    <Image src={user.picture} alt="user-profile-image" width={40} height={40} />
+                                <div className={css.circle}>
+                                    <Image className={css.profile_image} src={user.picture} alt="user-profile-image" width={60} height={60} />
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className={css.content_body}>
+                    <div className={css.contentBody}>
                         {loading && <Loading />}
                         {active == "home" && <Home />}
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "settings" && <Settings />}
+                        {active == "settings" && <Settings user={user} />}
+                        {active == "option_chain" && <OptionChain marketData={marketData} />}
+                        {active == "logs" && <Logs logs={logs} />}
+                        {/* <button onClick={() => requestUserNotificationPermission()}>Request Notification Permission</button> */}
+                        {/* <button onClick={() => somethingIDK()}>Something IDK</button> */}
                     </div>
                 </div>
             </div>

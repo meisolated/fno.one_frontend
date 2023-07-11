@@ -36,5 +36,4 @@ export default function List(props: props) {
             </div>
         </div>
     )
-
 }
