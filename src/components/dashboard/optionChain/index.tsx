@@ -1,13 +1,13 @@
 import { Dropdown, Table } from "@nextui-org/react"
-import Head from "next/head"
 import { useEffect, useState } from "react"
+
+import Head from "next/head"
 import css from "./style.module.css"
 
 export default function OptionChain({ marketData }: { marketData: any }) {
     const [isLoading, setLoading] = useState(false)
     const [currentExpiry, setCurrentExpiry] = useState<any>("")
     const [expiryList, setExpiryList] = useState<any>([])
-    const [strikePrices, setStrikePrices] = useState<any>([])
     const [currentExpiryOptionChain, setCurrentExpiryOptionChain] = useState<any>([])
     useEffect(() => {
         setLoading(true)
@@ -15,12 +15,10 @@ export default function OptionChain({ marketData }: { marketData: any }) {
             .then((res) => res.json())
             .then((d: optionChainApi) => {
                 console.log(d)
-                const expiryList = Object.keys(d.expiryListWithStrikePrices)
+                const expiryList = d.expiryList
                 setCurrentExpiry(d.currentExpiry)
-                setStrikePrices(d.strikePrices)
                 setExpiryList(expiryList)
-                setCurrentExpiryOptionChain(d.expiryListWithStrikePrices[d.currentExpiry])
-
+                setCurrentExpiryOptionChain(d.optionChainList)
                 setLoading(false)
             })
             .catch((err) => {
@@ -49,9 +47,10 @@ export default function OptionChain({ marketData }: { marketData: any }) {
                     {currentExpiryOptionChain.length > 0 &&
                         currentExpiryOptionChain.map((option: any, index: number) => {
                             return (
-                                <div key={index}>
-                                    <a>{option.identifier}:</a>
-                                    <a>{marketData[option.identifier] ? marketData[option.identifier].lp : 0}</a>
+                                <div key={index} className={css.optionChainWrapper}>
+                                    <a className={css.fullWidth}>{marketData[option.CE] ? marketData[option.CE].lp : 0}</a>
+                                    <a className={css.fullWidth}>{option.strike}</a>
+                                    <a className={css.fullWidth}>{marketData[option.PE] ? marketData[option.PE].lp : 0}</a>
                                 </div>
                             )
                         })}

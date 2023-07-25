@@ -1,17 +1,18 @@
-import Head from "next/head"
-import Image from "next/image"
-import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import io from "socket.io-client"
+
+import Head from "next/head"
 import Home from "../../components/dashboard/home"
+import Image from "next/image"
+import Loading from "../../components/loading"
 import Logs from "../../components/dashboard/logs"
 import OptionChain from "../../components/dashboard/optionChain"
 import Orders from "../../components/dashboard/orders"
 import Positions from "../../components/dashboard/positions"
 import Settings from "../../components/dashboard/settings"
 import Trades from "../../components/dashboard/trades"
-import Loading from "../../components/loading"
 import css from "./style.module.css"
+import io from "socket.io-client"
+import { useRouter } from "next/router"
 
 export default function Dashboard(props: any) {
     const [navbar, setNavbar] = useState(true)
@@ -59,9 +60,8 @@ export default function Dashboard(props: any) {
         publicSocket.emit("subscribeMarketDataUpdate", { sessionId: props.token })
         publicSocket.on("marketDataUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
-            const symbol = parsedData.symbol
+            const symbol = parsedData.symbol || parsedData.Symbol
             // console.log(parsedData)
-            console.log(parsedData)
             setMarketData((marketData: any) => {
                 return { ...marketData, [symbol]: parsedData }
             })
@@ -106,12 +106,14 @@ export default function Dashboard(props: any) {
             userSocket.emit("ping", "ping")
         }, 6000)
         userSocket.on("pong", (data: any) => {
+            console.log(data)
             return
         })
         userSocket.emit("subscribeOrderUpdate", { sessionId: props.token })
         userSocket.on("orderUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
             const message = parsedData.message
+            console.log(parsedData)
             setLogs((orderUpdates) => {
                 return [...orderUpdates, message]
             })
@@ -217,7 +219,7 @@ export default function Dashboard(props: any) {
                         </div>
 
                         <div className={css.content_header_right}>
-                            {marketData["NSE:NIFTYBANK-INDEX"] && <div dangerouslySetInnerHTML={{ __html: marketData["NSE:NIFTYBANK-INDEX"].lp }}></div>}
+                            {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>}
                             {/* <Grid>
                                 <Avatar size="xl" src={user.picture} color="gradient" bordered />
                             </Grid> */}

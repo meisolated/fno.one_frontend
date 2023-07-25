@@ -2,14 +2,9 @@ export { }
 
 declare global {
     interface optionChainApi {
-        expiryListWithStrikePrices: {
-            [strikePrice: string]: [{
-                identifier: string,
-                strikePrice: number,
-            }]
-        }
-        strikePrices: number[]
-        currentExpiry: string
+        optionChainList: Array<String>
+        expiryList: Array<String>
+        currentExpiry: String
     }
 
 }
