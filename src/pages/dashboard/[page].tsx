@@ -61,7 +61,6 @@ export default function Dashboard(props: any) {
         publicSocket.on("marketDataUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
             const symbol = parsedData.symbol || parsedData.Symbol
-            // console.log(parsedData)
             setMarketData((marketData: any) => {
                 return { ...marketData, [symbol]: parsedData }
             })
