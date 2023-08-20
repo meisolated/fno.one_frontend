@@ -105,7 +105,6 @@ export default function Dashboard(props: any) {
             userSocket.emit("ping", "ping")
         }, 6000)
         userSocket.on("pong", (data: any) => {
-            console.log(data)
             return
         })
         userSocket.emit("subscribeOrderUpdate", { sessionId: props.token })

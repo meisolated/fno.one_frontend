@@ -44,13 +44,18 @@ export default function OptionChain({ marketData }: { marketData: any }) {
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
+                    <div key={0} className={css.optionChainWrapper}>
+                        <a className={css.fullWidth}>CE</a>
+                        <a className={css.fullWidth}>STRIKE PRICE</a>
+                        <a className={css.fullWidth}>PE</a>
+                    </div>
                     {currentExpiryOptionChain.length > 0 &&
                         currentExpiryOptionChain.map((option: any, index: number) => {
                             return (
                                 <div key={index} className={css.optionChainWrapper}>
-                                    <a className={css.fullWidth}>{marketData[option.CE] ? marketData[option.CE].lp : 0}</a>
+                                    <a className={css.fullWidth}>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</a>
                                     <a className={css.fullWidth}>{option.strike}</a>
-                                    <a className={css.fullWidth}>{marketData[option.PE] ? marketData[option.PE].lp : 0}</a>
+                                    <a className={css.fullWidth}>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</a>
                                 </div>
                             )
                         })}
