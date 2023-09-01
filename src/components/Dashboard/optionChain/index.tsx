@@ -2,6 +2,7 @@ import { Dropdown, Table } from "@nextui-org/react"
 import { useEffect, useState } from "react"
 
 import Head from "next/head"
+import tableStyle from "../../Table/table.module.css"
 import css from "./style.module.css"
 
 export default function OptionChain({ marketData }: { marketData: any }) {
@@ -44,7 +45,7 @@ export default function OptionChain({ marketData }: { marketData: any }) {
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
-                    <div key={0} className={css.optionChainWrapper}>
+                    {/* <div key={0} className={css.optionChainWrapper}>
                         <a className={css.fullWidth}>CE</a>
                         <a className={css.fullWidth}>STRIKE PRICE</a>
                         <a className={css.fullWidth}>PE</a>
@@ -58,7 +59,28 @@ export default function OptionChain({ marketData }: { marketData: any }) {
                                     <a className={css.fullWidth}>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</a>
                                 </div>
                             )
-                        })}
+                        })} */}
+                    <table className={tableStyle.table}>
+                        <thead>
+                            <tr>
+                                <th>CE</th>
+                                <th>STRIKE PRICE</th>
+                                <th>PE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentExpiryOptionChain.length > 0 &&
+                                currentExpiryOptionChain.map((option: any, index: number) => {
+                                    return (
+                                        <tr key={index}>
+                                            <td>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</td>
+                                            <td>{option.strike}</td>
+                                            <td>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</td>
+                                        </tr>
+                                    )
+                                })}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router"
 import { useEffect } from "react"
-import Loading from "../../components/loading"
+import Loading from "../../components/Loading"
 
 export default function Dashboard(props: any) {
     const router = useRouter()

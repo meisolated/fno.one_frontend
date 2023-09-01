@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react"
 
 import Head from "next/head"
-import Home from "../../components/dashboard/home"
 import Image from "next/image"
-import Loading from "../../components/loading"
-import Logs from "../../components/dashboard/logs"
-import OptionChain from "../../components/dashboard/optionChain"
-import Orders from "../../components/dashboard/orders"
-import Positions from "../../components/dashboard/positions"
-import Settings from "../../components/dashboard/settings"
-import Trades from "../../components/dashboard/trades"
-import css from "./style.module.css"
-import io from "socket.io-client"
 import { useRouter } from "next/router"
+import io from "socket.io-client"
+import Home from "../../components/Dashboard/home"
+import Logs from "../../components/Dashboard/logs"
+import OptionChain from "../../components/Dashboard/optionChain"
+import Orders from "../../components/Dashboard/orders"
+import Positions from "../../components/Dashboard/positions"
+import Settings from "../../components/Dashboard/settings"
+import Trades from "../../components/Dashboard/trades"
+import Loading from "../../components/Loading"
+import css from "./style.module.css"
 
 export default function Dashboard(props: any) {
     const [navbar, setNavbar] = useState(true)
@@ -135,7 +135,7 @@ export default function Dashboard(props: any) {
 
         async function fetchData() {
             setLoading(true)
-            const _userData = await fetch("/internal_api/user")
+            const _userData = await fetch("/internalApi/user")
             const _data = await _userData.json()
             // setUser({ picture: _data.data.image })
             setLoading(false)

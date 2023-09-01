@@ -1,7 +1,7 @@
 import { Table } from "@nextui-org/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { StyledBadge } from "../../../components/dashboard/items/StyledBadge"
+import { StyledBadge } from "../items/StyledBadge"
 import css from "./style.module.css"
 export default function Trades() {
     const [tradesList, setTradesList] = useState([])

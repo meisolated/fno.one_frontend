@@ -1,0 +1,38 @@
+/* table.module.css */
+
+/* Reset some default table styling */
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Style for table headers */
+.table th {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #444;
+}
+
+/* Alternate row colors for better readability */
+/* .table tr:nth-child(even) {
+  background-color: #2d2d2d;
+} */
+
+/* Style for table cells */
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid #444;
+}
+
+/* Hover effect on table rows */
+.table tr:hover {
+  background-color: #3d3d3d;
+}
+
+/* Add a border to the last row */
+.table tr:last-child {
+  border-bottom: 2px solid #111;
+}

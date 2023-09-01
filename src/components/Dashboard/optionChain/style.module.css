@@ -1,5 +1,5 @@
 .pageWrapper {
-    width: 90%;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -8,12 +8,9 @@
 }
 
 .headerWrapper {
-    width: 100%;
+    width: 98%;
 }
 
-.ordersListWrapper {
-    width: 100%;
-}
 
 .optionChainWrapper {
     width: 100%;

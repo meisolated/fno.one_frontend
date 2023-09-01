@@ -3,7 +3,7 @@ import { setCookie } from "cookies-next"
 
 export default async function handler(req: any, res: any) {
     // const cookies = req.cookies
-    // const response = await axios.get("http://fno.one/internal_api/accept_access", { params: { ...req.query, cookies } })
+    // const response = await axios.get("http://fno.one/internalApi/acceptAccess", { params: { ...req.query, cookies } })
     // if (response.data.code === 200) {
     //     if (cookies["fno.one"]) {
     //         return await res.redirect("https://fno.one")

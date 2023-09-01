@@ -1,7 +1,7 @@
 import axios from "axios"
 import { deleteCookie } from "cookies-next"
 export default async function handler(req: any, res: any) {
-    await res.redirect("https://fno.one/internal_api/login")
+    await res.redirect("https://fno.one/internalApi/login")
     // if (req.cookies["fno.one"]) {
     //     const response = await axios.get("http://fno.one/internal_api/accept_access", { params: { cookies: req.cookies } })
     //     if (response.data.code === 200) {
