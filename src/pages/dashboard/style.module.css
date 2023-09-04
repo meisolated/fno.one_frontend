@@ -64,13 +64,12 @@
 }
 
 .navbar_vertical_item {
-
     cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: left;
-    width: 90%;
+    width: 88%;
     transition: all 0.3s ease-in-out;
     height: 45px;
     gap: 20px;

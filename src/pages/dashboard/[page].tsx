@@ -23,6 +23,7 @@ export default function Dashboard(props: any) {
     const [logs, setLogs] = useState<Array<string>>([])
     const [marketData, setMarketData] = useState<any>({})
     const [marketDataSocketConnected, setMarketDataSocketConnected] = useState(false)
+    const [currentTime, setCurrentTime] = useState("")
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -146,6 +147,11 @@ export default function Dashboard(props: any) {
             fetchData()
         }
     }, [])
+    useEffect(() => {
+        setInterval(() => {
+            setCurrentTime(new Date().toLocaleTimeString())
+        }, 500)
+    }, [])
     // if (loading) return <Loading />
 
     return (
@@ -218,6 +224,7 @@ export default function Dashboard(props: any) {
 
                         <div className={css.content_header_right}>
                             {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>}
+                            <div className={css.content_header_time}>{currentTime}</div>
                             {/* <Grid>
                                 <Avatar size="xl" src={user.picture} color="gradient" bordered />
                             </Grid> */}
