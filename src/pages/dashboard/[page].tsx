@@ -4,14 +4,14 @@ import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import io from "socket.io-client"
-import Home from "../../components/Dashboard/home"
-import Logs from "../../components/Dashboard/logs"
-import OptionChain from "../../components/Dashboard/optionChain"
-import Orders from "../../components/Dashboard/orders"
-import Positions from "../../components/Dashboard/positions"
-import Settings from "../../components/Dashboard/settings"
-import Trades from "../../components/Dashboard/trades"
 import Loading from "../../components/Loading"
+import Home from "../../components/Widgets/Dashboard/home"
+import Logs from "../../components/Widgets/Dashboard/logs"
+import OptionChain from "../../components/Widgets/Dashboard/optionChain"
+import Orders from "../../components/Widgets/Dashboard/orders"
+import Positions from "../../components/Widgets/Dashboard/positions"
+import Settings from "../../components/Widgets/Dashboard/settings"
+import Trades from "../../components/Widgets/Dashboard/trades"
 import css from "./style.module.css"
 
 export default function Dashboard(props: any) {
@@ -223,8 +223,10 @@ export default function Dashboard(props: any) {
                         </div>
 
                         <div className={css.content_header_right}>
-                            {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>}
-                            <div className={css.content_header_time}>{currentTime}</div>
+                            <div className={css.content_header_right_index_current_price}>
+                                {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>}
+                            </div>
+                            <div className={css.content_header_right_time}>{currentTime}</div>
                             {/* <Grid>
                                 <Avatar size="xl" src={user.picture} color="gradient" bordered />
                             </Grid> */}

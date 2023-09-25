@@ -198,6 +198,14 @@
     overflow: hidden;
 }
 
+.content_header_right_index_current_price {
+    width: 70px;
+}
+
+.content_header_right_time {
+    width: 65px;
+}
+
 .profile_image {
     width: 100%;
     height: 100%;

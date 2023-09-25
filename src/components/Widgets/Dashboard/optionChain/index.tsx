@@ -2,7 +2,7 @@ import { Dropdown, Table } from "@nextui-org/react"
 import { useEffect, useState } from "react"
 
 import Head from "next/head"
-import tableStyle from "../../Table/table.module.css"
+import tableStyle from "../../../Table/table.module.css"
 import css from "./style.module.css"
 
 export default function OptionChain({ marketData }: { marketData: any }) {
