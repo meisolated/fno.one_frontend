@@ -1,0 +1,22 @@
+/* Badge.css */
+.buyBadge {
+    font-size: 10px;
+    font-weight: bold;
+    width: fit-content;
+    background-color: #042F14;
+    color: #41EC8B;
+    border-radius: 9px;
+    padding: 1px 7px;
+
+}
+
+.sellBadge {
+    font-size: 10px;
+    font-weight: bold;
+    width: fit-content;
+    border-radius: 9px;
+    padding: 1px 7px;
+    background-color: #300313;
+    color: #F4256D;
+
+}

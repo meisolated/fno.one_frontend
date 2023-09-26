@@ -1,8 +1,8 @@
-import { Dropdown, Table } from "@nextui-org/react"
 import { useEffect, useState } from "react"
+import Dropdown from "../../../Dropdown"
 
 import Head from "next/head"
-import tableStyle from "../../../Table/table.module.css"
+import tableStyle from "../../../Table/style.module.css"
 import css from "./style.module.css"
 
 export default function OptionChain({ marketData }: { marketData: any }) {
@@ -36,30 +36,8 @@ export default function OptionChain({ marketData }: { marketData: any }) {
                 <div className={css.headerWrapper}>
                     <h1>Option Chain</h1>
                     <a>{currentExpiry}</a>
-                    {/* make drop down of expiry list */}
-                    <Dropdown>
-                        <Dropdown.Button flat>Expiry {currentExpiry}</Dropdown.Button>
-                        <Dropdown.Menu aria-label="Dynamic Actions" items={expiryList}>
-                            {expiryList.map((expiry: any, index: number) => {
-                                return <Dropdown.Item key={index}>{expiry}</Dropdown.Item>
-                            })}
-                        </Dropdown.Menu>
-                    </Dropdown>
-                    {/* <div key={0} className={css.optionChainWrapper}>
-                        <a className={css.fullWidth}>CE</a>
-                        <a className={css.fullWidth}>STRIKE PRICE</a>
-                        <a className={css.fullWidth}>PE</a>
-                    </div>
-                    {currentExpiryOptionChain.length > 0 &&
-                        currentExpiryOptionChain.map((option: any, index: number) => {
-                            return (
-                                <div key={index} className={css.optionChainWrapper}>
-                                    <a className={css.fullWidth}>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</a>
-                                    <a className={css.fullWidth}>{option.strike}</a>
-                                    <a className={css.fullWidth}>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</a>
-                                </div>
-                            )
-                        })} */}
+                    <Dropdown items={expiryList} callbackFunction={setCurrentExpiry} />
+
                     <table className={tableStyle.table}>
                         <thead>
                             <tr>

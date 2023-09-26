@@ -1,7 +1,7 @@
-import { Table } from "@nextui-org/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { StyledBadge } from "../items/StyledBadge"
+import badgeStyle from "../../../Badge/style.module.css"
+import tableStyle from "../../../Table/style.module.css"
 import css from "./style.module.css"
 
 export default function Orders() {
@@ -12,7 +12,6 @@ export default function Orders() {
         const getOrders = async () => {
             setLoading(true)
             const Orders = await fetch("https://fno.one/api/orders")
-            // if error
             Orders.ok ? console.log("Orders fetched") : setError("Orders fetch failed")
             const OrdersJson = await Orders.json()
             setOrdersList(OrdersJson.orders)
@@ -34,33 +33,32 @@ export default function Orders() {
 
                 <div className={css.ordersListWrapper}>
                     {!isLoading && (
-                        <Table aria-label="Orders Table" css={{ height: "auto", width: "90%", borderRadius: "30px" }} bordered shadow={false}>
-                            <Table.Header>
-                                <Table.Column>Order Date Time</Table.Column>
-                                <Table.Column>Symbol</Table.Column>
-                                <Table.Column>Side</Table.Column>
-                                <Table.Column>Traded Quantity</Table.Column>
-                                <Table.Column>Trade Price</Table.Column>
-                            </Table.Header>
-                            <Table.Body>
+                        <table className={tableStyle.table}>
+                            <thead>
+                                <tr>
+                                    <th>Order Date Time</th>
+                                    <th>Symbol</th>
+                                    <th>Side</th>
+                                    <th>Traded Quantity</th>
+                                    <th>Trade Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {OrdersList.map((order: any) => (
-                                    <Table.Row key={order.orderDateTime}>
-                                        <Table.Cell>{order.orderDateTime}</Table.Cell>
-                                        <Table.Cell>{order.symbol}</Table.Cell>
-                                        <Table.Cell>
-                                            <StyledBadge type={order.side === 1 ? "buy" : "sell"}>{order.side === 1 ? "Buy" : "Sell"}</StyledBadge>
-                                        </Table.Cell>
-                                        <Table.Cell>{order.filledQty}</Table.Cell>
-                                        <Table.Cell>{order.tradedPrice}</Table.Cell>
-                                    </Table.Row>
+                                    <tr key={order.orderDateTime}>
+                                        <td>{order.orderDateTime}</td>
+                                        <td>{order.symbol}</td>
+                                        <td>{order.side === 1 ? <div className={badgeStyle.buyBadge}>BUY</div> : <div className={badgeStyle.sellBadge}>SELL</div>}</td>
+                                        <td>{order.filledQty}</td>
+                                        <td>{order.tradedPrice}</td>
+                                    </tr>
                                 ))}
-                            </Table.Body>
-                        </Table>
+                            </tbody>
+                        </table>
                     )}
                     {error && <p>{error}</p>}
                 </div>
             </div>
-            {/* {!isLoading && <List columns={["orderDateTime", "side", "segment", "tradedQty", "tradePrice", "tradeValue", "symbol"]} rows={OrdersList} />} */}
         </div>
     )
 }

@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import styles from "./style.module.css"
 
-const Dropdown = ({ items }: any) => {
+const Dropdown = ({ items, callbackFunction }: any) => {
     const [isOpen, setIsOpen] = useState(false)
     const [selectedItem, setSelectedItem] = useState(null)
     const dropdownRef = useRef<HTMLDivElement | null>(null)
@@ -14,6 +14,7 @@ const Dropdown = ({ items }: any) => {
         setIsOpen(false)
     }
     const handleItemClick = (item: any) => {
+        callbackFunction(item)
         setSelectedItem(item)
         setIsOpen(false)
     }
@@ -24,10 +25,10 @@ const Dropdown = ({ items }: any) => {
     }
 
     useEffect(() => {
-        document.addEventListener('mousedown', handleOutsideClick)
+        document.addEventListener("mousedown", handleOutsideClick)
 
         return () => {
-            document.removeEventListener('mousedown', handleOutsideClick)
+            document.removeEventListener("mousedown", handleOutsideClick)
         }
     }, [])
     return (

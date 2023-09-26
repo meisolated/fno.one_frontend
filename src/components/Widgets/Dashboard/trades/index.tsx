@@ -1,7 +1,9 @@
 import { Table } from "@nextui-org/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { StyledBadge } from "../items/StyledBadge"
+import badgeStyle from "../../../Badge/style.module.css"
+import tableStyle from "../../../Table/style.module.css"
+import { StyledBadge } from "../../../Items/StyledBadge"
 import css from "./style.module.css"
 export default function Trades() {
     const [tradesList, setTradesList] = useState([])
@@ -53,8 +55,42 @@ export default function Trades() {
                 </div>
             </div>
             <h2>Trades List</h2>
-            {/* {!isLoading && <List columns={["orderDateTime", "side", "segment", "tradedQty", "tradePrice", "tradeValue", "symbol"]} rows={tradesList} />} */}
             {!isLoading && (
+                <table className={tableStyle.table}>
+                    <thead>
+                        <tr>
+                            <th>Order Date Time</th>
+                            <th>Symbol</th>
+                            <th>Side</th>
+                            <th>Traded Quantity</th>
+                            <th>Trade Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {tradesList.map((trade: any, index: number) => {
+                            return (
+                                <tr key={index}>
+                                    <td>{trade.orderDateTime}</td>
+                                    <td>{trade.symbol}</td>
+                                    {trade.side === 1 ? (
+                                        <td>
+                                            <div className={badgeStyle.buyBadge}>BUY</div>
+                                        </td>
+                                    ) : (
+                                        <td>
+                                            <div className={badgeStyle.sellBadge}>SELL</div>
+                                        </td>
+                                    )}
+                                    <td>{trade.tradedQty}</td>
+                                    <td>{trade.tradePrice}</td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            )}
+            {/* {!isLoading && <List columns={["orderDateTime", "side", "segment", "tradedQty", "tradePrice", "tradeValue", "symbol"]} rows={tradesList} />} */}
+            {/* {!isLoading && (
                 <Table aria-label="Trades Table" css={{ height: "auto", width: "90%", borderRadius: "30px" }} bordered shadow={false}>
                     <Table.Header>
                         <Table.Column>Order Date Time</Table.Column>
@@ -86,7 +122,7 @@ export default function Trades() {
                     </Table.Body>
                     {pagination && <Table.Pagination shadow noMargin align="center" rowsPerPage={10} onPageChange={(page) => console.log({ page })} />}
                 </Table>
-            )}
+            )} */}
             {error && <h1>{error}</h1>}
         </div>
     )
