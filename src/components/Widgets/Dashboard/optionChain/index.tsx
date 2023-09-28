@@ -2,19 +2,20 @@ import { useEffect, useState } from "react"
 import Dropdown from "../../../Dropdown"
 
 import Head from "next/head"
+import TextInput from "../../../InputText"
 import tableStyle from "../../../Table/style.module.css"
 import css from "./style.module.css"
 
-export default function OptionChain({ marketData }: { marketData: any }) {
+export default function OptionChain({ marketData }: any) {
     const [isLoading, setLoading] = useState(false)
-    const [currentExpiry, setCurrentExpiry] = useState<any>("")
+    const [currentExpiry, setCurrentExpiry] = useState<String>("")
     const [expiryList, setExpiryList] = useState<any>([])
     const [currentExpiryOptionChain, setCurrentExpiryOptionChain] = useState<any>([])
     useEffect(() => {
         setLoading(true)
         fetch("/api/optionChain?symbol=BANKNIFTY")
             .then((res) => res.json())
-            .then((d: optionChainApi) => {
+            .then((d: any) => {
                 console.log(d)
                 const expiryList = d.expiryList
                 setCurrentExpiry(d.currentExpiry)
@@ -35,9 +36,8 @@ export default function OptionChain({ marketData }: { marketData: any }) {
             <div className={css.pageWrapper}>
                 <div className={css.headerWrapper}>
                     <h1>Option Chain</h1>
-                    <a>{currentExpiry}</a>
                     <Dropdown items={expiryList} callbackFunction={setCurrentExpiry} />
-
+                    <NewTradeSettingsWidget currentExpiryOptionChain={currentExpiryOptionChain} marketData={marketData} />
                     <table className={tableStyle.table}>
                         <thead>
                             <tr>
@@ -60,6 +60,87 @@ export default function OptionChain({ marketData }: { marketData: any }) {
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    )
+}
+
+const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData }: any) => {
+    const [side, setSide] = useState(1)
+    const [quantity, setQuantity] = useState(0)
+    const [optionPrice, setOptionPrice] = useState(0)
+    const [RiskToRewardRatio, setRiskToRewardRatio] = useState(0)
+    const [stopLoss, setStopLoss] = useState(0)
+    const [closestOption, setClosestOption] = useState(0)
+    const [fundsRequirement, setFundsRequirement] = useState(0)
+    const [maxLoss, setMaxLoss] = useState(0)
+
+    const onChangeSide = () => {
+        const _side = side == 1 ? -1 : 1
+        setSide(_side)
+    }
+    const onChangeQuantity = (value: any) => {
+        setQuantity(value)
+        onFormUpdate()
+    }
+    const onChangeOptionPrice = (value: any) => {
+        setOptionPrice(value)
+        onFormUpdate()
+    }
+    const onChangeRiskToRewardRatio = (value: any) => {
+        setRiskToRewardRatio(value)
+        onFormUpdate()
+    }
+    const onChangeStopLoss = (value: any) => {
+        setStopLoss(value)
+        onFormUpdate()
+    }
+
+    const onFormUpdate = () => {
+        if (quantity !== 0 && optionPrice !== 0 && RiskToRewardRatio !== 0 && stopLoss !== 0) {
+            const _closestOption = quantity * optionPrice
+            const _fundsRequirement = quantity * optionPrice
+            const _maxLoss = quantity * optionPrice
+            setClosestOption(_closestOption)
+            setFundsRequirement(_fundsRequirement)
+            setMaxLoss(_maxLoss)
+        }
+    }
+
+    function findClosestNumber() {
+        if (optionPrice == 0) return
+        currentExpiryOptionChain.map((option: any, index: number) => {
+            if (side == 1) {
+                const ltp = marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP
+                if (optionPrice > ltp) {
+                    console.log(ltp)
+                }
+            }
+        })
+    }
+
+    return (
+        <div className={css.newTradeSettingsWidget}>
+            <div className={css.newTradeSettingsLeftChild}>
+                <div className={css.newTradeSettingsWidgetChild}>
+                    <TextInput placeholder="Quantity " type="number" onChange={(value: any) => onChangeQuantity(value)} />
+                    <TextInput placeholder="Option Price" type="number" onChange={(value: any) => onChangeOptionPrice(value)} />
+                </div>
+                <div className={css.newTradeSettingsWidgetChild}>
+                    <TextInput placeholder="Risk to Reward Ratio" type="number" onChange={(value: any) => onChangeRiskToRewardRatio(value)} />
+                    <TextInput placeholder="StopLoss" type="number" onChange={(value: any) => onChangeStopLoss(value)} />
+                </div>
+                <div className={css.newTradeSide}>
+                    <button className={` ${side == 1 ? css.buySideButton : css.sellSideButton}`} onClick={() => onChangeSide()}>
+                        {side == 1 ? "CALL" : "PUT"} SIDE
+                    </button>
+                </div>
+                <button className={css.placeOrderButton}>Place Order</button>
+            </div>
+            <div className={css.newTradeSettingsRightChild}>
+                <div>Closest Option {closestOption}</div>
+                <div>Funds Requirement {fundsRequirement}</div>
+                <div>Max Loss {maxLoss}</div>
             </div>
         </div>
     )

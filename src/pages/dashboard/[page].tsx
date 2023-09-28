@@ -12,6 +12,8 @@ import Orders from "../../components/Widgets/Dashboard/orders"
 import Positions from "../../components/Widgets/Dashboard/positions"
 import Settings from "../../components/Widgets/Dashboard/settings"
 import Trades from "../../components/Widgets/Dashboard/trades"
+import PublicWebsocket from "../../websocket/public.websocket"
+import UserWebsocket from '../../websocket/user.websocket'
 import css from "./style.module.css"
 
 export default function Dashboard(props: any) {
@@ -34,92 +36,11 @@ export default function Dashboard(props: any) {
         router.push(`/dashboard/${e}`)
     }
 
-    const playSound = () => {
-        const audio = new Audio("https://fno.one/mp3/ding.mp3")
-        audio.play()
-    }
     async function socketInitializer() {
-        // Public Socket
-        const publicSocket = io("wss://fno.one/public", {
-            transports: ["websocket"],
-            upgrade: false,
-            path: "/socket",
-            query: {
-                sessionId: props.token,
-            },
-        })
-        publicSocket.on("connect", () => {
-            setLogs((logs: any) => {
-                return [...logs, "Public Socket Connected"]
-            })
-        })
-        publicSocket.on("disconnect", () => {
-            setLogs((logs: any) => {
-                return [...logs, "Public Socket Disconnected"]
-            })
-        })
-        publicSocket.emit("subscribeMarketDataUpdate", { sessionId: props.token })
-        publicSocket.on("marketDataUpdate", (data: any) => {
-            const parsedData = JSON.parse(data)
-            const symbol = parsedData.symbol || parsedData.Symbol
-            setMarketData((marketData: any) => {
-                return { ...marketData, [symbol]: parsedData }
-            })
-            // if (!marketDataSocketConnected) {
-            //     setMarketDataSocketConnected(() => true)
-            //     console.log("Market Data Socket Connected")
-
-            //     console.log(marketDataSocketConnected)
-            //     setLogs((logs: any) => {
-            //         return [...logs, "Market Data Socket Connected"]
-            //     })
-            // } else {
-
-            // }
-        })
-
-        // User Socket
-        const userSocket = io("wss://fno.one/user", {
-            transports: ["websocket"],
-            upgrade: false,
-            path: "/socket",
-            query: {
-                sessionId: props.token,
-            },
-        })
-        userSocket.on("connect", () => {
-            setLogs((logs: any) => {
-                return [...logs, "User Socket Connected"]
-            })
-        })
-        userSocket.on("disconnect", () => {
-            setLogs((logs: any) => {
-                return [...logs, "User Socket Disconnected"]
-            })
-        })
-        userSocket.on("error", (err: any) => {
-            setLogs((logs: any) => {
-                return [...logs, "User Socket Error: " + err]
-            })
-        })
-        setInterval(() => {
-            userSocket.emit("ping", "ping")
-        }, 6000)
-        userSocket.on("pong", (data: any) => {
-            return
-        })
-        userSocket.emit("subscribeOrderUpdate", { sessionId: props.token })
-        userSocket.on("orderUpdate", (data: any) => {
-            const parsedData = JSON.parse(data)
-            const message = parsedData.message
-            console.log(parsedData)
-            setLogs((orderUpdates) => {
-                return [...orderUpdates, message]
-            })
-            if (message.includes("CONFIRMED")) {
-                playSound()
-            }
-        })
+        const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs)
+        publicWebSocket.connect()
+        const userWebsocket = new UserWebsocket(props.token, setLogs)
+        userWebsocket.connect()
     }
 
     useEffect(() => {

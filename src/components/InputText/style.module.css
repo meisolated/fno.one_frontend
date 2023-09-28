@@ -1,24 +1,62 @@
-/* TextInput.css */
-.textInput {
-    padding: 10px;
-    border: none;
-    border-radius: 12px;
-    background-color: #16181A;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    outline: none;
-    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+.form__group {
+    position: relative;
+    padding: 15px 0 0;
+    margin-top: 10px;
+    /* width: 50%; */
 }
 
-.textInput::placeholder {
-    color: #ccc;
+.form__field {
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #9b9b9b;
+    outline: 0;
+    font-size: 1.3rem;
+    color: #fff;
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
 }
 
-.textInput:focus {
-    background-color: #16181abe;
-    border: 1px solid #16181A;
+.form__field::placeholder {
+    color: transparent;
 }
 
-.textInput:hover {
-    background-color: #16181abe;
-    border: 1px solid #16181A;
+.form__field:placeholder-shown~.form__label {
+    font-size: 1.3rem;
+    cursor: text;
+    top: 20px;
+}
+
+.form__label {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: #9b9b9b;
+}
+
+.form__field:focus {
+    padding-bottom: 6px;
+    font-weight: 700;
+    border-width: 3px;
+    border-image: linear-gradient(to right, var(--primary-color), var(--primary-color));
+    border-image-slice: 1;
+}
+
+.form__field:focus~.form__label {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+/* reset input */
+.form__field:required,
+.form__field:invalid {
+    box-shadow: none;
 }

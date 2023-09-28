@@ -23,3 +23,66 @@
 .fullWidth {
     width: 100%;
 }
+
+/* newTradeSettingsWidget */
+.newTradeSettingsWidget {
+    display: flex;
+    flex-direction: row;
+}
+
+.newTradeSettingsLeftChild {
+    width: 100%;
+}
+
+.newTradeSettingsRightChild {
+    width: 100%;
+}
+
+.newTradeSettingsWidgetChild {
+    display: flex;
+    margin: 10px;
+    gap: 10px
+}
+
+.newTradeSide {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 10px;
+}
+
+.buySideButton {
+    background-color: #41EC8B;
+    color: #f8f8f8;
+    border-radius: 10px;
+    border: none;
+    padding: 5px 10px;
+    transition: 0.3s ease-in-out;
+}
+
+.sellSideButton {
+    background-color: #F4256D;
+    color: #ffff;
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    transition: 0.3s ease-in-out;
+}
+
+.placeOrderButton {
+    background-color: var(--primary-color);
+    border: none;
+    width: fit-content;
+    margin: 10px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    transition: 0.1s ease-in-out;
+}
+
+.placeOrderButton:hover {
+    /*grow effect  */
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--primary-color);
+    cursor: pointer;
+}
