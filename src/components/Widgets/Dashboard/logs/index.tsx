@@ -6,7 +6,7 @@ interface Props {
 }
 
 export default function Logs(props: Props) {
-    useEffect(() => { }, [])
+    useEffect(() => {}, [])
     return (
         <div>
             <Head>

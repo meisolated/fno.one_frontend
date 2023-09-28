@@ -12,8 +12,10 @@ import Orders from "../../components/Widgets/Dashboard/orders"
 import Positions from "../../components/Widgets/Dashboard/positions"
 import Settings from "../../components/Widgets/Dashboard/settings"
 import Trades from "../../components/Widgets/Dashboard/trades"
+import NotificationSender from "../../components/notificationSender"
+import NotificationComponent from "../../components/requestNotificationPermission"
 import PublicWebsocket from "../../websocket/public.websocket"
-import UserWebsocket from '../../websocket/user.websocket'
+import UserWebsocket from "../../websocket/user.websocket"
 import css from "./style.module.css"
 
 export default function Dashboard(props: any) {
@@ -38,8 +40,8 @@ export default function Dashboard(props: any) {
 
     async function socketInitializer() {
         const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs)
-        publicWebSocket.connect()
         const userWebsocket = new UserWebsocket(props.token, setLogs)
+        publicWebSocket.connect()
         userWebsocket.connect()
     }
 
@@ -73,8 +75,6 @@ export default function Dashboard(props: any) {
             setCurrentTime(new Date().toLocaleTimeString())
         }, 500)
     }, [])
-    // if (loading) return <Loading />
-
     return (
         <>
             <Head>
@@ -168,7 +168,8 @@ export default function Dashboard(props: any) {
                         {active == "settings" && <Settings user={user} />}
                         {active == "option_chain" && <OptionChain marketData={marketData} />}
                         {active == "logs" && <Logs logs={logs} />}
-                        {/* <button onClick={() => requestUserNotificationPermission()}>Request Notification Permission</button> */}
+                        <NotificationComponent />
+                        <NotificationSender />
                         {/* <button onClick={() => somethingIDK()}>Something IDK</button> */}
                     </div>
                 </div>
