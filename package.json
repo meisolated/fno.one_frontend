@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start -p 3010",
     "lint": "next lint",
-    "format": "prettier --write \"{src,test}/**/*.{jsx,tsx}\"",
+    "format": "prettier --write \"{src,test}/**/*.{tsx,ts}\"",
     "svgs": "svgr --ext tsx -d ./src/assets/svg ./src/assets/svg/src",
     "devInstall": "NODE_ENV=development yarn install",
     "clean:install": "rm -rf node_modules && rm -rf .next && yarn install"

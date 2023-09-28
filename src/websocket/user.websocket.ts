@@ -1,5 +1,5 @@
-import io from 'socket.io-client'
-import { playSound } from '../helper'
+import io from "socket.io-client"
+import { playSound } from "../helper"
 import * as log from "../helper/consoleLog"
 export default class UserWebsocket {
     private socket
