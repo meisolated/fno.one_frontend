@@ -16,7 +16,6 @@ export default function OptionChain({ marketData }: any) {
         fetch("/api/optionChain?symbol=BANKNIFTY")
             .then((res) => res.json())
             .then((d: any) => {
-                console.log(d)
                 const expiryList = d.expiryList
                 setCurrentExpiry(d.currentExpiry)
                 setExpiryList(expiryList)
@@ -24,7 +23,6 @@ export default function OptionChain({ marketData }: any) {
                 setLoading(false)
             })
             .catch((err) => {
-                console.log(err)
                 setLoading(false)
             })
     }, [])
@@ -113,7 +111,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData }: any) =
             if (side == 1) {
                 const ltp = marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP
                 if (optionPrice > ltp) {
-                    console.log(ltp)
                 }
             }
         })

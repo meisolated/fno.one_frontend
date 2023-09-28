@@ -23,9 +23,7 @@ export default function Settings(props: Props) {
             }
         })
     }
-    useEffect(() => {
-        console.log(props.user)
-    }, [])
+    useEffect(() => {}, [])
     return (
         <div>
             <Head>

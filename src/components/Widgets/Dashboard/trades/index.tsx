@@ -28,14 +28,12 @@ export default function Trades() {
         const getTrades = async () => {
             setLoading(true)
             const trades = await fetch("https://fno.one/api/trades")
-            trades.ok ? console.log("trades fetched") : setError("trades fetch failed")
             const tradesJson = await trades.json()
             const _tradesList = tradesJson.trades
             setTradesList(_tradesList)
             if (_tradesList.length > 20) {
                 setPagination(true)
             }
-            console.log(_tradesList)
             const tradesPAndL: any = tradesPAndLCalculation(tradesJson.trades)
             setTradesPAndL(tradesPAndL)
             setLoading(false)

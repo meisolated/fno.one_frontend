@@ -24,11 +24,7 @@ const NotificationSender = () => {
         }
     }
 
-    return (
-        <div>
-            {/* <button onClick={sendNotification}>Send Notification</button> */}
-        </div>
-    )
+    return <div>{/* <button onClick={sendNotification}>Send Notification</button> */}</div>
 }
 
 export default NotificationSender

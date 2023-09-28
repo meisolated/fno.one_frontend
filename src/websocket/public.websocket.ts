@@ -1,4 +1,5 @@
-import io from 'socket.io-client'
+import io from "socket.io-client"
+import * as log from "../helper/consoleLog"
 export default class PublicWebsocket {
     private socket
     private socketOptions
@@ -23,16 +24,19 @@ export default class PublicWebsocket {
     public connect() {
         this.socket.connect()
         this.socket.on("connect", () => {
+            log.success("Connected to public websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Connected to public websocket"]
             })
         })
         this.socket.on("disconnect", () => {
+            log.warning("Disconnected from public websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Disconnected from public websocket"]
             })
         })
         this.socket.on("error", (error: any) => {
+            log.error("Error from public websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Error from public websocket"]
             })
@@ -44,15 +48,13 @@ export default class PublicWebsocket {
             this.setMarket((marketData: any) => {
                 return { ...marketData, [symbol]: parsedData }
             })
-
         })
-
     }
     public disconnect() {
+        log.warning("Disconnecting from public websocket")
         this.socket.disconnect()
     }
     public isConnected() {
         return this.socket.connected
     }
-
 }

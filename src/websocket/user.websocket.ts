@@ -1,5 +1,6 @@
 import io from 'socket.io-client'
 import { playSound } from '../helper'
+import * as log from "../helper/consoleLog"
 export default class UserWebsocket {
     private socket
     private socketOptions
@@ -23,16 +24,19 @@ export default class UserWebsocket {
     public connect() {
         this.socket.connect()
         this.socket.on("connect", () => {
+            log.success("Connected to user websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Connected to user websocket"]
             })
         })
         this.socket.on("disconnect", () => {
+            log.warning("Disconnected from user websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Disconnected from user websocket"]
             })
         })
         this.socket.on("error", (error: any) => {
+            log.error("Error from user websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Error from user websocket"]
             })
@@ -41,7 +45,7 @@ export default class UserWebsocket {
         this.socket.on("orderUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
             const message = parsedData.message
-            console.log(parsedData)
+            log.info(message)
             this.setLogs((orderUpdates: any) => {
                 return [...orderUpdates, message]
             })
@@ -49,6 +53,9 @@ export default class UserWebsocket {
                 playSound()
             }
         })
-
+    }
+    public disconnect() {
+        log.warning("Disconnecting from user websocket")
+        this.socket.disconnect()
     }
 }

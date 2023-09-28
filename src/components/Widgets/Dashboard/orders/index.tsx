@@ -12,10 +12,8 @@ export default function Orders() {
         const getOrders = async () => {
             setLoading(true)
             const Orders = await fetch("https://fno.one/api/orders")
-            Orders.ok ? console.log("Orders fetched") : setError("Orders fetch failed")
             const OrdersJson = await Orders.json()
             setOrdersList(OrdersJson.orders)
-            console.log(OrdersJson)
             setLoading(false)
         }
         getOrders()
