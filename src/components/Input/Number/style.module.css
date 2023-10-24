@@ -1,0 +1,90 @@
+.formGroup {
+    position: relative;
+    padding: 15px 0 0;
+    margin-top: 10px;
+    /* width: 50%; */
+}
+
+.formField {
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #9b9b9b;
+    outline: 0;
+    font-size: 1.3rem;
+    color: #fff;
+    padding: 7px 0;
+    background: transparent;
+    transition: border-color 0.2s;
+}
+
+.formField::placeholder {
+    color: transparent;
+}
+
+.formField:placeholder-shown~.formLabel {
+    font-size: 1.3rem;
+    cursor: text;
+    top: 20px;
+}
+
+.formLabel {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: #9b9b9b;
+}
+
+.formField:focus {
+    padding-bottom: 6px;
+    font-weight: 700;
+    border-width: 3px;
+    border-image: linear-gradient(to right, var(--primary-color), var(--primary-color));
+    border-image-slice: 1;
+}
+
+.formField:focus~.formLabel {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.formNumber {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #9b9b9b;
+
+}
+
+.formNumberButton {
+    border: none;
+    background: #ffff;
+    color: var(--primary-color);
+    font-size: 1rem;
+    cursor: pointer;
+    outline: none;
+    padding: 0 5px;
+    margin: 0 0 0 10px;
+    border-radius: 5px;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    align-items: center;
+}
+
+/* reset input */
+.formField:required,
+.formField:invalid {
+    box-shadow: none;
+}

@@ -198,9 +198,16 @@
     overflow: hidden;
 }
 
+/* RIGHT SIDE CURRENT MARKET LTP */
 .content_header_right_index_current_price {
-    width: 70px;
+    width: 230px;
+    border: 1px solid white;
+    padding: 0 5px;
+    border-radius: 5px;
+    font-size: 15px;
 }
+
+
 
 .content_header_right_time {
     width: 65px;

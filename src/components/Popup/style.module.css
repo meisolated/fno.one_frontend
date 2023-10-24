@@ -1,0 +1,66 @@
+/* components/Popup.module.css */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--popup-background-color);
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border: 1px solid #3a3a3a;
+    z-index: var(--z-index-popup);
+    width: 100%;
+    max-width: 400px;
+}
+
+.popIn {
+    opacity: 1;
+}
+
+.popOut {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+}
+
+.popupContent {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.popupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.closeButton {
+    color: #fff;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.popupFooter {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.popupFooter button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    margin-left: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.popupFooter button:hover {
+    background-color: #0056b3;
+}

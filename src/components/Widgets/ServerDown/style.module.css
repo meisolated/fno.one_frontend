@@ -1,0 +1,25 @@
+/* FILEPATH: /home/dev/projects/fno.one/fno.one_frontend/src/components/Widgets/ServerDown/style.module.css */
+
+/* Main container */
+.serverDown {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: var(--background-color);
+}
+
+/* Title */
+.serverDown h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    color: #ffff;
+}
+
+/* Subtitle */
+.serverDown p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: #ffff;
+}

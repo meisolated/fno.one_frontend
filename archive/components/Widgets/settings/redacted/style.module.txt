@@ -1,0 +1,60 @@
+.contentWrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.settingsWrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {}
+
+.tabsItems {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 500;
+    height: auto;
+    line-height: 50px;
+    padding: 0 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border-radius: 10px;
+}
+
+.tabsItems:hover {
+    background-color: var(--primary-color);
+    transition: all 0.2s ease-in-out;
+}
+
+
+.navbarItemActive {
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    transition: all 0.2s ease-in-out;
+    /* cursor: pointer; */
+    display: inline-block;
+    font-size: 20px;
+    font-weight: 500;
+    height: auto;
+    line-height: 50px;
+    padding: 0 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+@media screen and (max-width: 768px) {
+    .tabsItems {
+        font-size: 15px;
+        line-height: 40px;
+    }
+
+    .navbarItemActive {
+        font-size: 15px;
+        line-height: 40px;
+    }
+
+}

@@ -53,7 +53,7 @@
 }
 
 .buySideButton {
-    background-color: #41EC8B;
+    background-color: #19c061;
     color: #f8f8f8;
     border-radius: 10px;
     border: none;
@@ -62,7 +62,7 @@
 }
 
 .sellSideButton {
-    background-color: #F4256D;
+    background-color: #c9084b;
     color: #ffff;
     border: none;
     border-radius: 10px;
@@ -71,6 +71,7 @@
 }
 
 .placeOrderButton {
+    color: #ffff;
     background-color: var(--primary-color);
     border: none;
     width: fit-content;
@@ -84,5 +85,59 @@
     /*grow effect  */
     transform: scale(1.05);
     box-shadow: 0 0 10px var(--primary-color);
+    cursor: pointer;
+}
+
+/* Choose Index */
+.chooseIndex {
+    border: 1px solid white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 10px;
+    width: fit-content;
+    padding: 5px 10px;
+    border-radius: 15px;
+    transition: 0.3s ease-in-out;
+}
+
+.indexList {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: 10px;
+}
+
+.indexButton {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 10px;
+    padding: 5px 10px;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.indexButtonActive {
+    background-color: #19c061;
+    cursor: pointer;
+    color: #f8f8f8;
+    border-radius: 10px;
+    border: none;
+    padding: 5px 10px;
+    transition: 0.3s ease-in-out;
+}
+
+.indexButton:hover {
+    /*grow effect  */
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--primary-color);
+    cursor: pointer;
+}
+
+.indexButtonActive:hover {
+    /*grow effect  */
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #19c061;
     cursor: pointer;
 }

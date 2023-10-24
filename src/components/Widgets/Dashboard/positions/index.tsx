@@ -3,7 +3,7 @@ export default function positions() {
     return (
         <div>
             <Head>
-                <title>positions</title>
+                <title>Positions</title>
             </Head>
             <h1>positions</h1>
         </div>

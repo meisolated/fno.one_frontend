@@ -1,60 +1,56 @@
-.contentWrapper {
-    height: 100%;
+.pageWrapper {
+    padding: 10px;
+}
+
+.positionTypeSettingsWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    align-items: left;
+    width: fit-content;
+    margin-bottom: 20px;
+}
+
+.settingsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 10px;
     width: 100%;
+    margin-bottom: 20px;
+    padding-right: 20px;
+    gap: 20px;
+}
+
+.settingsGridItem {
     display: flex;
     flex-direction: column;
+    justify-content: left;
+    align-items: left;
+    width: 100%;
+    margin-bottom: 20px;
 }
 
-.settingsWrapper {
+/* funds grid */
+.fundsItemWrapper {
     display: flex;
     flex-direction: column;
+    justify-content: left;
+    align-items: left;
+    width: 100%;
 }
 
-.tabs {}
+.fundsItem {
+    width: 100%;
 
-.tabsItems {
-    cursor: pointer;
-    display: inline-block;
-    font-size: 20px;
-    font-weight: 500;
-    height: auto;
-    line-height: 50px;
-    padding: 0 15px;
-    text-decoration: none;
-    text-transform: uppercase;
-    border-radius: 10px;
 }
 
-.tabsItems:hover {
-    background-color: var(--primary-color);
-    transition: all 0.2s ease-in-out;
-}
-
-
-.navbarItemActive {
-    border-radius: 10px;
-    background-color: var(--primary-color);
-    transition: all 0.2s ease-in-out;
-    /* cursor: pointer; */
-    display: inline-block;
-    font-size: 20px;
-    font-weight: 500;
-    height: auto;
-    line-height: 50px;
-    padding: 0 15px;
-    text-decoration: none;
-    text-transform: uppercase;
+.fundsDataLabel {
+    float: right;
 }
 
 @media screen and (max-width: 768px) {
-    .tabsItems {
-        font-size: 15px;
-        line-height: 40px;
-    }
-
-    .navbarItemActive {
-        font-size: 15px;
-        line-height: 40px;
+    .settingsGrid {
+        grid-template-columns: 1fr;
     }
 
 }

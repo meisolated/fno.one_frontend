@@ -13,7 +13,6 @@
     "clean:install": "rm -rf node_modules && rm -rf .next && yarn install"
   },
   "dependencies": {
-    "@nextui-org/react": "^1.0.0-beta.12",
     "@types/axios": "^0.14.0",
     "@types/cookie": "^0.5.1",
     "@types/socket.io-client": "^3.0.0",

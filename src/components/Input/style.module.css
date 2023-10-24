@@ -1,11 +1,11 @@
-.form__group {
+.formGroup {
     position: relative;
     padding: 15px 0 0;
     margin-top: 10px;
     /* width: 50%; */
 }
 
-.form__field {
+.formField {
     font-family: inherit;
     width: 100%;
     border: 0;
@@ -18,17 +18,17 @@
     transition: border-color 0.2s;
 }
 
-.form__field::placeholder {
+.formField::placeholder {
     color: transparent;
 }
 
-.form__field:placeholder-shown~.form__label {
+.formField:placeholder-shown~.formLabel {
     font-size: 1.3rem;
     cursor: text;
     top: 20px;
 }
 
-.form__label {
+.formLabel {
     position: absolute;
     top: 0;
     display: block;
@@ -37,7 +37,7 @@
     color: #9b9b9b;
 }
 
-.form__field:focus {
+.formField:focus {
     padding-bottom: 6px;
     font-weight: 700;
     border-width: 3px;
@@ -45,7 +45,7 @@
     border-image-slice: 1;
 }
 
-.form__field:focus~.form__label {
+.formField:focus~.formLabel {
     position: absolute;
     top: 0;
     display: block;
@@ -55,8 +55,36 @@
     font-weight: 700;
 }
 
+.formNumber {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #9b9b9b;
+
+}
+
+.formNumberButton {
+    border: none;
+    background: #ffff;
+    color: var(--primary-color);
+    font-size: 1rem;
+    cursor: pointer;
+    outline: none;
+    padding: 0 5px;
+    margin: 0 0 0 10px;
+    border-radius: 5px;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    align-items: center;
+}
+
 /* reset input */
-.form__field:required,
-.form__field:invalid {
+.formField:required,
+.formField:invalid {
     box-shadow: none;
 }

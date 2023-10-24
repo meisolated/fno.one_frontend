@@ -1,15 +1,12 @@
-import { Table } from "@nextui-org/react"
 import Head from "next/head"
 import { useEffect, useState } from "react"
 import badgeStyle from "../../../Badge/style.module.css"
 import tableStyle from "../../../Table/style.module.css"
-import { StyledBadge } from "../../../Items/StyledBadge"
 import css from "./style.module.css"
 export default function Trades() {
     const [tradesList, setTradesList] = useState([])
     const [isLoading, setLoading] = useState(false)
     const [tradesPAndL, setTradesPAndL] = useState(0)
-    const [pagination, setPagination] = useState<Boolean>(false)
     const [error, setError] = useState<String>("")
 
     const tradesPAndLCalculation = (list: any) => {
@@ -29,12 +26,9 @@ export default function Trades() {
             setLoading(true)
             const trades = await fetch("https://fno.one/api/trades")
             const tradesJson = await trades.json()
-            const _tradesList = tradesJson.trades
+            const _tradesList = tradesJson.trades.filter((trade: any) => trade.segment == 11)
             setTradesList(_tradesList)
-            if (_tradesList.length > 20) {
-                setPagination(true)
-            }
-            const tradesPAndL: any = tradesPAndLCalculation(tradesJson.trades)
+            const tradesPAndL: any = tradesPAndLCalculation(_tradesList)
             setTradesPAndL(tradesPAndL)
             setLoading(false)
         }

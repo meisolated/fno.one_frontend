@@ -1,6 +1,5 @@
 // NotificationComponent.js
 import React, { useEffect, useState } from "react"
-
 const NotificationComponent = () => {
     const [notificationPermission, setNotificationPermission] = useState("")
 

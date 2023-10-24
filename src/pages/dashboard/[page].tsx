@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 
 import Head from "next/head"
 import Image from "next/image"
@@ -26,7 +26,11 @@ export default function Dashboard(props: any) {
     const [logs, setLogs] = useState<Array<string>>([])
     const [marketData, setMarketData] = useState<any>({})
     const [marketDataSocketConnected, setMarketDataSocketConnected] = useState(false)
+    const [optionChainData, setOptionChainData] = useState<any>({})
     const [currentTime, setCurrentTime] = useState("")
+    const [indexLTP, setIndexLTP] = useState<any>({})
+    const [indies, setIndies] = useState<any>(["BANKNIFTY", "NIFTY", "FINNIFTY"])
+    const [indiesConfig, setIndiesConfig] = useState<any>({})
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -49,6 +53,19 @@ export default function Dashboard(props: any) {
     }, [])
 
     useEffect(() => {
+        if (loading) return
+        // console.log(marketData)
+
+        indies.map((index: any, i: any) => {
+            if (!marketData[indiesConfig[index].name]) return
+            setIndexLTP((prev: any) => {
+                if (typeof marketData[indiesConfig[index].name].lp == "undefined") return prev
+                return { ...prev, [indiesConfig[index].name]: marketData[indiesConfig[index].name].lp }
+            })
+        })
+    }, [marketData])
+
+    useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
         setActive(props.query.page || "home")
         router.events.on("routeChangeStart", (url) => {
@@ -61,11 +78,22 @@ export default function Dashboard(props: any) {
             const _userData = await fetch("/internalApi/user")
             const _data = await _userData.json()
             // setUser({ picture: _data.data.image })
+            await fetch("/api/optionChain")
+                .then((res) => res.json())
+                .then((d: any) => {
+                    setOptionChainData(d)
+                    setIndies(d.indies)
+                    setIndiesConfig(d.indiesConfig)
+                    d.indies.map((index: any, i: any) => {
+                        setIndexLTP((prev: any) => {
+                            return { ...prev, [d.indiesConfig[index].name]: d.indexLTP.filter((x: any) => x.trueDataSymbol == d.indiesConfig[index].name)[0].ltp }
+                        })
+                    })
+                })
             setLoading(false)
         }
 
         if (loading) {
-            setLoading(false)
             fetchData()
         }
     }, [])
@@ -112,7 +140,7 @@ export default function Dashboard(props: any) {
                         </div>
 
                         <div className="divider margin-top-n-bottom" />
-                        <div className={`${css.navbar_vertical_item} ${active == "option_chain" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("option_chain")}>
+                        <div className={`${css.navbar_vertical_item} ${active == "optionChain" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("optionChain")}>
                             <div className={css.navbar_vertical_item_icon}>
                                 <div className="material-symbols-rounded ">link</div>
                             </div>
@@ -144,7 +172,18 @@ export default function Dashboard(props: any) {
 
                         <div className={css.content_header_right}>
                             <div className={css.content_header_right_index_current_price}>
-                                {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>}
+                                {/* {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>} */}
+                                {/* BANK NIFTY : 3333.3 <br />
+                                NIFTY : 3333.3 <br />
+                                FIN NIFTY : 3333.3 <br /> */}
+                                {!loading &&
+                                    indies.map((index: any, i: any) => {
+                                        return (
+                                            <div key={i}>
+                                                {indiesConfig[index].name}: {indexLTP[indiesConfig[index].name]} <br />
+                                            </div>
+                                        )
+                                    })}
                             </div>
                             <div className={css.content_header_right_time}>{currentTime}</div>
                             {/* <Grid>
@@ -164,8 +203,8 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "settings" && <Settings user={user} />}
-                        {active == "option_chain" && <OptionChain marketData={marketData} />}
+                        {active == "settings" && <Settings />}
+                        {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} />}
                         {active == "logs" && <Logs logs={logs} />}
                         <NotificationComponent />
                         <NotificationSender />
@@ -181,7 +220,7 @@ export const getServerSideProps = async (context: any) => {
     const forwarded = context.req.headers["x-real-ip"]
     const token = context.req.cookies["fno.one"] || null
     const ip = forwarded ? forwarded.split(/, /)[0] : context.req.connection.remoteAddress
-    if (ip === "103.62.93.150" || ip === "::ffff:127.0.0.1") {
+    if (ip === "103.62.95.22" || ip === "::ffff:127.0.0.1") {
         if (!token) {
             return {
                 redirect: {

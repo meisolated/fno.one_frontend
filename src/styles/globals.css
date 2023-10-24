@@ -33,7 +33,9 @@
     --primary-color: #126edd;
     --background-color: #131113;
     --sidebar-color: #1A191A;
+    --popup-background-color: #1A191A;
     --logo-font: "THICCCBOI-ThicccAF";
+    --z-index-popup: "100";
 }
 
 body {
@@ -84,4 +86,38 @@ body {
 .small-text {
     font-size: 12px;
     color: #A0A0A0;
+}
+
+/* underline */
+.underline {
+    text-decoration: underline;
+}
+
+/* margins */
+.margin-top {
+    margin-top: 20px;
+}
+
+/* some buttons  */
+.disabledButton {
+    cursor: not-allowed !important;
+    background-color: #2B2B2B !important;
+    color: #A0A0A0 !important;
+}
+
+.smallButton {
+    background-color: #126edd;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-align: center;
+}
+
+
+.smallButton:hover {
+    background-color: #0d4cc2;
 }
