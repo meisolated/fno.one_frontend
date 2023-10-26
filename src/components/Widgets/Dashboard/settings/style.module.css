@@ -9,6 +9,12 @@
     align-items: left;
     width: fit-content;
     margin-bottom: 20px;
+    width: 100%;
+}
+
+.positionTypeSettingsItem {
+    border: 1px solid #e0e0e0;
+    padding: 10px;
 }
 
 .settingsGrid {

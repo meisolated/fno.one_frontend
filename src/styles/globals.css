@@ -83,14 +83,33 @@ body {
     align-items: center;
 }
 
-.small-text {
-    font-size: 12px;
-    color: #A0A0A0;
+.full-width {
+    width: 100%;
 }
 
-/* underline */
+.text-center {
+    text-align: center;
+}
+
+.small-text {
+    font-size: 12px;
+}
+
+.medium-text {
+    font-size: 16px;
+}
+
+.big-text {
+    font-size: 20px;
+}
+
+/* text styles */
 .underline {
     text-decoration: underline;
+}
+
+.uppercase {
+    text-transform: uppercase;
 }
 
 /* margins */

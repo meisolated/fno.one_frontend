@@ -1,6 +1,6 @@
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import TextInput from "../../../Input"
+import TextInput from "../../../Input/Text"
 import tableStyle from "../../../Table/style.module.css"
 import css from "./style.module.css"
 

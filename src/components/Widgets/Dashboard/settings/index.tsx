@@ -1,16 +1,16 @@
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import TextInput from "../../../Input"
 import NumberInput from "../../../Input/Number"
+import TextInput from "../../../Input/Text"
 import Loading from "../../../Loading"
 import style from "./style.module.css"
 export default function Settings() {
     // ---- State Variables ----
     const [positionType, setPositionType] = useState<any>({
-        longPosition: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-        scalpingPosition: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-        swingPosition: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-        expiryPosition: { percentageOfFundsToUse: 0, fundsToUse: 0 },
+        longPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        scalpingPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        swingPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        expiryPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
     })
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)
@@ -19,41 +19,48 @@ export default function Settings() {
         total: 0,
         used: 0,
     })
-    const [percentageOfFundsToUse, setPercentageOfFundsToUse] = useState<any>({
+    const [moneyManager, setMoneyManager] = useState<any>({
         percentageOfFundsToUse: 0,
-        fundsToUse: 0
+        fundsToUse: 0,
     })
     // ---- End of State Variables ----
 
     // ---- Functions ----
     function onPositionTypeChange(positionType: string, value: number) {
         setPositionType((prev: any) => {
-            return { ...prev, [positionType]: { percentageOfFundsToUse: value, fundsToUse: ((percentageOfFundsToUse.fundsToUse * value) / 100).toFixed(2) } }
+            return { ...prev, [positionType]: { percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) } }
         })
     }
 
     async function onPercentageOfFundsToUseChange(value: number) {
-        setPercentageOfFundsToUse((prev: any) => {
+        setMoneyManager((prev: any) => {
             return { ...prev, percentageOfFundsToUse: value, fundsToUse: ((funds.available * value) / 100).toFixed(2) }
         })
-
     }
 
+    function onPreferredOptionPriceChange(positionType: string, value: number) {
+        setPositionType((prev: any) => {
+            return { ...prev, [positionType]: { ...prev[positionType], preferredOptionPrice: value } }
+        })
+    }
+    function onRiskToRewardRatioChange(positionType: string, value: number) {
+        setPositionType((prev: any) => {
+            return { ...prev, [positionType]: { ...prev[positionType], riskToRewardRatio: value } }
+        })
+    }
+
+    // ---- Button Clicks Functions ----
     function onPositionTypeSaveButtonClicked() {
         if (isLoading) return
         if (saved) return
-        fetch("/internalApi/update/user/updatePositionTypeSettings", {
+        fetch("/internalApi/user/updatePositionTypeSettings", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 positionTypeSettings: positionType,
-                moneyManager: {
-                    percentageOfFundsToUse: percentageOfFundsToUse.percentageOfFundsToUse,
-                    fundsToUse: percentageOfFundsToUse.fundsToUse
-                }
-
+                moneyManager: moneyManager,
             }),
         })
             .then((res) => res.json())
@@ -63,6 +70,7 @@ export default function Settings() {
                 setSaved(true)
             })
     }
+    // ---- End of Button Clicks Functions ----
 
     // ---- End of Functions ----
 
@@ -73,14 +81,14 @@ export default function Settings() {
                 setSaved(false)
             }, 500)
         }
-    }, [positionType, percentageOfFundsToUse])
+    }, [positionType, moneyManager])
 
     useEffect(() => {
         onPositionTypeChange("longPosition", positionType.longPosition.percentageOfFundsToUse)
         onPositionTypeChange("scalpingPosition", positionType.scalpingPosition.percentageOfFundsToUse)
         onPositionTypeChange("swingPosition", positionType.swingPosition.percentageOfFundsToUse)
         onPositionTypeChange("expiryPosition", positionType.expiryPosition.percentageOfFundsToUse)
-    }, [percentageOfFundsToUse])
+    }, [moneyManager])
 
     useEffect(() => {
         setIsLoading(true)
@@ -88,7 +96,7 @@ export default function Settings() {
             .then((res) => res.json())
             .then(({ data }) => {
                 setPositionType(data.positionTypeSettings)
-                setPercentageOfFundsToUse(data.moneyManager)
+                setMoneyManager(data.moneyManager)
                 setFunds(data.funds.fyers)
                 setIsLoading(false)
             })
@@ -107,34 +115,103 @@ export default function Settings() {
                     <h2>Position Type Settings</h2>
                     <div>Percentage of Funds to Use</div>
                     <div className={style.positionTypeSettingsWrapper}>
-                        <NumberInput
-                            placeholder={`Long Position % [₹ ${positionType.longPosition.fundsToUse}]`}
-                            onChange={(value: any) => onPositionTypeChange("longPosition", value)}
-                            incrementalValue={5}
-                            maxValue={100}
-                            startValue={positionType.longPosition.percentageOfFundsToUse}
-                        />
-                        <NumberInput
-                            placeholder={`Scalping Position % [₹ ${positionType.scalpingPosition.fundsToUse}]`}
-                            onChange={(value: any) => onPositionTypeChange("scalpingPosition", value)}
-                            incrementalValue={5}
-                            maxValue={100}
-                            startValue={positionType.scalpingPosition.percentageOfFundsToUse}
-                        />
-                        <NumberInput
-                            placeholder={`Swing Position % [₹ ${positionType.swingPosition.fundsToUse}]`}
-                            onChange={(value: any) => onPositionTypeChange("swingPosition", value)}
-                            maxValue={100}
-                            incrementalValue={5}
-                            startValue={positionType.swingPosition.percentageOfFundsToUse}
-                        />
-                        <NumberInput
-                            placeholder={`Expiry Position % [₹ ${positionType.expiryPosition.fundsToUse}]`}
-                            onChange={(value: any) => onPositionTypeChange("expiryPosition", value)}
-                            maxValue={100}
-                            incrementalValue={5}
-                            startValue={positionType.expiryPosition.percentageOfFundsToUse}
-                        />
+                        <div className={style.positionTypeSettingsItem}>
+                            <div className="text-center full-width underline">
+                                <a>Long Position</a>
+                            </div>
+                            <NumberInput
+                                placeholder={`Percentage % [₹ ${positionType.longPosition.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("longPosition", value)}
+                                incrementalValue={5}
+                                maxValue={100}
+                                startValue={positionType.longPosition.percentageOfFundsToUse}
+                            />
+                            <TextInput
+                                placeholder={`Preferred Option Price`}
+                                onChange={(value: any) => onPreferredOptionPriceChange("longPosition", value)}
+                                startValue={positionType.longPosition.preferredOptionPrice}
+                            />
+                            <NumberInput
+                                placeholder={`RTR Ratio`}
+                                onChange={(value: any) => onRiskToRewardRatioChange("longPosition", value)}
+                                incrementalValue={1}
+                                maxValue={15}
+                                startValue={positionType.longPosition.riskToRewardRatio}
+                            />
+                        </div>
+                        <div className={style.positionTypeSettingsItem}>
+                            <div className="text-center full-width underline">
+                                <a>Scalping Position</a>
+                            </div>
+                            <NumberInput
+                                placeholder={`Percentage % [₹ ${positionType.scalpingPosition.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("scalpingPosition", value)}
+                                incrementalValue={5}
+                                maxValue={100}
+                                startValue={positionType.scalpingPosition.percentageOfFundsToUse}
+                            />
+                            <TextInput
+                                placeholder={`Preferred Option Price`}
+                                onChange={(value: any) => onPreferredOptionPriceChange("scalpingPosition", value)}
+                                startValue={positionType.scalpingPosition.preferredOptionPrice}
+                            />
+                            <NumberInput
+                                placeholder={`RTR Ratio`}
+                                onChange={(value: any) => onRiskToRewardRatioChange("scalpingPosition", value)}
+                                incrementalValue={1}
+                                maxValue={15}
+                                startValue={positionType.scalpingPosition.riskToRewardRatio}
+                            />
+                        </div>
+
+                        <div className={style.positionTypeSettingsItem}>
+                            <div className="text-center full-width underline">
+                                <a>Swing Position</a>
+                            </div>
+                            <NumberInput
+                                placeholder={`Percentage % [₹ ${positionType.swingPosition.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("swingPosition", value)}
+                                maxValue={100}
+                                incrementalValue={5}
+                                startValue={positionType.swingPosition.percentageOfFundsToUse}
+                            />
+                            <TextInput
+                                placeholder={`Preferred Option Price`}
+                                onChange={(value: any) => onPreferredOptionPriceChange("swingPosition", value)}
+                                startValue={positionType.swingPosition.preferredOptionPrice}
+                            />
+                            <NumberInput
+                                placeholder={`RTR Ratio`}
+                                onChange={(value: any) => onRiskToRewardRatioChange("swingPosition", value)}
+                                incrementalValue={1}
+                                maxValue={15}
+                                startValue={positionType.swingPosition.riskToRewardRatio}
+                            />
+                        </div>
+                        <div className={style.positionTypeSettingsItem}>
+                            <div className="text-center full-width underline">
+                                <a>Expiry Position</a>
+                            </div>
+                            <NumberInput
+                                placeholder={`Percentage % [₹ ${positionType.expiryPosition.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("expiryPosition", value)}
+                                maxValue={100}
+                                incrementalValue={5}
+                                startValue={positionType.expiryPosition.percentageOfFundsToUse}
+                            />
+                            <TextInput
+                                placeholder={`Preferred Option Price`}
+                                onChange={(value: any) => onPreferredOptionPriceChange("expiryPosition", value)}
+                                startValue={positionType.expiryPosition.preferredOptionPrice}
+                            />
+                            <NumberInput
+                                placeholder={`RTR Ratio`}
+                                onChange={(value: any) => onRiskToRewardRatioChange("expiryPosition", value)}
+                                incrementalValue={1}
+                                maxValue={15}
+                                startValue={positionType.expiryPosition.riskToRewardRatio}
+                            />
+                        </div>
                         <div className="margin-top" />
                         <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>
                             {saved ? "SAVED" : "SAVE"}
@@ -144,7 +221,13 @@ export default function Settings() {
                 <div className={style.settingsGridItem}>
                     <h2>Funds Settings</h2>
                     <div>Percentage of Funds to Use</div>
-                    <NumberInput placeholder={`Percentage %  [₹ ${percentageOfFundsToUse.fundsToUse}]`} onChange={(value: any) => onPercentageOfFundsToUseChange(value)} incrementalValue={5} maxValue={100} startValue={percentageOfFundsToUse.percentageOfFundsToUse} />
+                    <NumberInput
+                        placeholder={`Percentage %  [₹ ${moneyManager.fundsToUse}]`}
+                        onChange={(value: any) => onPercentageOfFundsToUseChange(value)}
+                        incrementalValue={5}
+                        maxValue={100}
+                        startValue={moneyManager.percentageOfFundsToUse}
+                    />
                     <div className="margin-top" />
                     {/* <div className="margin-top" /> */}
                     <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>

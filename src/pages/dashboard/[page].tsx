@@ -6,6 +6,7 @@ import { useRouter } from "next/router"
 import Loading from "../../components/Loading"
 import NotificationSender from "../../components/Notification/notificationSender"
 import NotificationComponent from "../../components/Notification/requestNotificationPermission"
+import Alerts from "../../components/Widgets/Dashboard/Alerts"
 import Home from "../../components/Widgets/Dashboard/home"
 import Logs from "../../components/Widgets/Dashboard/logs"
 import OptionChain from "../../components/Widgets/Dashboard/optionChain"
@@ -18,8 +19,8 @@ import UserWebsocket from "../../websocket/user.websocket"
 import css from "./style.module.css"
 
 export default function Dashboard(props: any) {
-    const [navbar, setNavbar] = useState(true)
     const router = useRouter()
+    const [navbar, setNavbar] = useState(true)
     const [active, setActive] = useState("home")
     const [loading, setLoading] = useState(true)
     const [user, setUser] = useState({ picture: "/anime-girl.gif" })
@@ -31,6 +32,7 @@ export default function Dashboard(props: any) {
     const [indexLTP, setIndexLTP] = useState<any>({})
     const [indies, setIndies] = useState<any>(["BANKNIFTY", "NIFTY", "FINNIFTY"])
     const [indiesConfig, setIndiesConfig] = useState<any>({})
+    const [isTodayHoliday, setIsTodayHoliday] = useState(false)
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -77,6 +79,7 @@ export default function Dashboard(props: any) {
             setLoading(true)
             const _userData = await fetch("/internalApi/user")
             const _data = await _userData.json()
+            setIsTodayHoliday(_data.data.todayHoliday)
             // setUser({ picture: _data.data.image })
             await fetch("/api/optionChain")
                 .then((res) => res.json())
@@ -146,6 +149,12 @@ export default function Dashboard(props: any) {
                             </div>
                             <div className={css.navbar_vertical_item_text}>Option Chain</div>
                         </div>
+                        <div className={`${css.navbar_vertical_item} ${active == "alerts" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("alerts")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded">alarm</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Alerts</div>
+                        </div>
                         <div className="divider margin-top-n-bottom" />
                         <div className={`${css.navbar_vertical_item} ${active == "settings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("settings")}>
                             <div className={css.navbar_vertical_item_icon}>
@@ -203,8 +212,9 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "settings" && <Settings />}
                         {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} />}
+                        {active == "alerts" && <Alerts marketData={marketData} />}
+                        {active == "settings" && <Settings />}
                         {active == "logs" && <Logs logs={logs} />}
                         <NotificationComponent />
                         <NotificationSender />
@@ -212,6 +222,14 @@ export default function Dashboard(props: any) {
                     </div>
                 </div>
             </div>
+            {isTodayHoliday && (
+                <div className={css.footerNotification}>
+                    {" "}
+                    <div className={css.footerText}>
+                        <a className="uppercase big-text">Today is Holiday</a>
+                    </div>
+                </div>
+            )}
         </>
     )
 }
