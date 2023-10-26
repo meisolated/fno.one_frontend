@@ -77,7 +77,7 @@ export default function Dashboard(props: any) {
 
         async function fetchData() {
             setLoading(true)
-            const _userData = await fetch("/internalApi/user")
+            const _userData = await fetch("/internalApi/user/get")
             const _data = await _userData.json()
             setIsTodayHoliday(_data.data.todayHoliday)
             // setUser({ picture: _data.data.image })

@@ -1,5 +1,5 @@
 import Head from "next/head"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import NumberInput from "../../../Input/Number"
 import style from "./style.module.css"
 export default function Alerts({ marketData }: any) {
@@ -20,6 +20,7 @@ export default function Alerts({ marketData }: any) {
     const [currentSymbol, setCurrentSymbol] = useState<any>("BANK NIFTY")
     const [alertPrice, setAlertPrice] = useState(0)
     const [condition, setCondition] = useState("greater")
+    const [alertsList, setAlertsList] = useState<any>([])
 
     function onAlertPriceChange(_price: any) {
         setAlertPrice(_price)
@@ -55,7 +56,19 @@ export default function Alerts({ marketData }: any) {
             console.log(err)
         })
     }
-
+    useEffect(() => {
+        fetch("/internalApi/marketAlerts/get").then(async (res) => {
+            const json: any = await res.json()
+            if (json.code == 200) {
+                console.log(json.marketAlerts)
+                setAlertsList(json.marketAlerts)
+            } else {
+                console.log(json)
+            }
+        }).catch((err) => {
+            console.log(err)
+        })
+    }, [])
     return (
         <div>
             <Head>

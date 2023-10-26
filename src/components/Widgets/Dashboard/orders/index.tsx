@@ -42,8 +42,8 @@ export default function Orders() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {OrdersList.map((order: any) => (
-                                    <tr key={order.orderDateTime}>
+                                {OrdersList.map((order: any, index: any) => (
+                                    <tr key={index}>
                                         <td>{order.orderDateTime}</td>
                                         <td>{order.symbol}</td>
                                         <td>{order.side === 1 ? <div className={badgeStyle.buyBadge}>BUY</div> : <div className={badgeStyle.sellBadge}>SELL</div>}</td>

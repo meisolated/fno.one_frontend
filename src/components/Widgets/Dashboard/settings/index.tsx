@@ -26,9 +26,9 @@ export default function Settings() {
     // ---- End of State Variables ----
 
     // ---- Functions ----
-    function onPositionTypeChange(positionType: string, value: number) {
+    function onPositionTypeChange(_positionType: string, value: number) {
         setPositionType((prev: any) => {
-            return { ...prev, [positionType]: { percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) } }
+            return { ...prev, [_positionType]: { ...positionType[_positionType], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) } }
         })
     }
 
@@ -84,6 +84,11 @@ export default function Settings() {
     }, [positionType, moneyManager])
 
     useEffect(() => {
+        // this useEffect is causing a problem
+        /**
+         * next-dev.js:20 Warning: A component is changing a controlled input to be uncontrolled. This is likely caused by the value changing from a defined to undefined, which should not happen.
+         * Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+         */
         onPositionTypeChange("longPosition", positionType.longPosition.percentageOfFundsToUse)
         onPositionTypeChange("scalpingPosition", positionType.scalpingPosition.percentageOfFundsToUse)
         onPositionTypeChange("swingPosition", positionType.swingPosition.percentageOfFundsToUse)
@@ -92,18 +97,20 @@ export default function Settings() {
 
     useEffect(() => {
         setIsLoading(true)
-        fetch("/internalApi/user")
+        fetch("/internalApi/user/get")
             .then((res) => res.json())
             .then(({ data }) => {
                 setPositionType(data.positionTypeSettings)
                 setMoneyManager(data.moneyManager)
                 setFunds(data.funds.fyers)
-                setIsLoading(false)
+                setTimeout(() => {
+                    setIsLoading(false)
+                }, 1000)
             })
     }, [])
 
     // ---- End of Effects ----
-    if (isLoading) <Loading />
+    if (isLoading) return <Loading />
     return (
         <div className={style.pageWrapper}>
             <Head>
