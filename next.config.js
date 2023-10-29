@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
   swcMinify: true,
-  images: { domains: ["picsum.photos", "randomuser.me", "fyers-user-details.s3.amazonaws.com"] }
+  images: { domains: ["picsum.photos", "randomuser.me", "fno.one", "myaccount-docs-prod.fyers.in"] }
 }
 
 module.exports = nextConfig

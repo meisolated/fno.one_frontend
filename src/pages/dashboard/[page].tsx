@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import Head from "next/head"
 import Image from "next/image"
@@ -6,14 +6,14 @@ import { useRouter } from "next/router"
 import Loading from "../../components/Loading"
 import NotificationSender from "../../components/Notification/notificationSender"
 import NotificationComponent from "../../components/Notification/requestNotificationPermission"
-import Alerts from "../../components/Widgets/Dashboard/Alerts"
-import Home from "../../components/Widgets/Dashboard/home"
-import Logs from "../../components/Widgets/Dashboard/logs"
-import OptionChain from "../../components/Widgets/Dashboard/optionChain"
-import Orders from "../../components/Widgets/Dashboard/orders"
-import Positions from "../../components/Widgets/Dashboard/positions"
-import Settings from "../../components/Widgets/Dashboard/settings"
-import Trades from "../../components/Widgets/Dashboard/trades"
+import Alerts from "../../components/pages/Dashboard/alerts"
+import Home from "../../components/pages/Dashboard/home"
+import Logs from "../../components/pages/Dashboard/logs"
+import OptionChain from "../../components/pages/Dashboard/optionChain"
+import Orders from "../../components/pages/Dashboard/orders"
+import Positions from "../../components/pages/Dashboard/positions"
+import Settings from "../../components/pages/Dashboard/settings"
+import Trades from "../../components/pages/Dashboard/trades"
 import PublicWebsocket from "../../websocket/public.websocket"
 import UserWebsocket from "../../websocket/user.websocket"
 import css from "./style.module.css"
@@ -23,7 +23,7 @@ export default function Dashboard(props: any) {
     const [navbar, setNavbar] = useState(true)
     const [active, setActive] = useState("home")
     const [loading, setLoading] = useState(true)
-    const [user, setUser] = useState({ picture: "/anime-girl.gif" })
+    const [user, setUser] = useState({ image: "/anime-girl.gif" })
     const [logs, setLogs] = useState<Array<string>>([])
     const [marketData, setMarketData] = useState<any>({})
     const [marketDataSocketConnected, setMarketDataSocketConnected] = useState(false)
@@ -56,7 +56,6 @@ export default function Dashboard(props: any) {
 
     useEffect(() => {
         if (loading) return
-        // console.log(marketData)
 
         indies.map((index: any, i: any) => {
             if (!marketData[indiesConfig[index].name]) return
@@ -80,7 +79,7 @@ export default function Dashboard(props: any) {
             const _userData = await fetch("/internalApi/user/get")
             const _data = await _userData.json()
             setIsTodayHoliday(_data.data.todayHoliday)
-            // setUser({ picture: _data.data.image })
+            setUser(_data.data)
             await fetch("/api/optionChain")
                 .then((res) => res.json())
                 .then((d: any) => {
@@ -178,7 +177,6 @@ export default function Dashboard(props: any) {
                         <div className={css.content_header_left}>
                             <div className={css.content_header_title}>{active}</div>
                         </div>
-
                         <div className={css.content_header_right}>
                             <div className={css.content_header_right_index_current_price}>
                                 {/* {marketData["NIFTY BANK"] && <div dangerouslySetInnerHTML={{ __html: marketData["NIFTY BANK"].lp }}></div>} */}
@@ -201,7 +199,7 @@ export default function Dashboard(props: any) {
 
                             <div className={css.profile_wrapper}>
                                 <div className={css.circle}>
-                                    <Image className={css.profile_image} src={user.picture} alt="user-profile-image" width={60} height={60} />
+                                    <Image className={css.profile_image} src={user.image ? user.image : "/anime-girl.gif"} alt="user-profile-image" width={60} height={60} />
                                 </div>
                             </div>
                         </div>
@@ -212,8 +210,8 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} />}
-                        {active == "alerts" && <Alerts marketData={marketData} />}
+                        {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} />}
+                        {active == "alerts" && <Alerts marketData={marketData} indexLTP={indexLTP} />}
                         {active == "settings" && <Settings />}
                         {active == "logs" && <Logs logs={logs} />}
                         <NotificationComponent />

@@ -1,10 +1,20 @@
 import Head from "next/head"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
+import { roundToNearestMultiple } from "../../../../helper"
+import NumberInput from "../../../Input/Number"
 import TextInput from "../../../Input/Text"
+import Selector from "../../../Selector"
 import tableStyle from "../../../Table/style.module.css"
 import css from "./style.module.css"
 
-export default function OptionChain({ marketData, optionChainData }: any) {
+interface props {
+    marketData: any
+    optionChainData: any
+    user: any
+    indexLTP: any
+}
+
+export default function OptionChain({ marketData, optionChainData, user, indexLTP, }: props) {
     // const indies = ["BANKNIFTY", "NIFTY", "FINNIFTY"]
     const [isLoading, setLoading] = useState(true)
     const [optionChain, setCurrentOptionChain] = useState<any>([])
@@ -12,12 +22,22 @@ export default function OptionChain({ marketData, optionChainData }: any) {
     const [index, setIndex] = useState<any>("BANKNIFTY")
     const [indies, setIndies] = useState<any>(["BANKNIFTY", "NIFTY", "FINNIFTY"])
     const [indiesConfig, setIndiesConfig] = useState<any>({})
+    const [ATMStrikePrice, setATMStrikePrice] = useState<any>(null)
 
+    function calculateATMStrikePrice() {
+        const currentIndexLTP = indexLTP[indiesConfig[index].name]
+        const roundOffPrice = roundToNearestMultiple(currentIndexLTP, indiesConfig[index].strikePriceGap)
+        const filteredOptions = allIndiesOptionChain[index].filter((option: any) => option.strike == roundOffPrice)
+        setATMStrikePrice(filteredOptions)
+    }
     function onIndexChange(_index: any) {
         setIndex(_index)
         setCurrentOptionChain(allIndiesOptionChain[_index])
     }
-
+    useEffect(() => {
+        if (!indexLTP[indiesConfig[index]?.name]) return
+        calculateATMStrikePrice()
+    }, [indiesConfig, index, indexLTP])
     useEffect(() => {
         if (!optionChainData.indies && !optionChain.allIndiesOptionChain && !optionChainData.indiesConfig) return
         setIndies(optionChainData.indies)
@@ -36,7 +56,7 @@ export default function OptionChain({ marketData, optionChainData }: any) {
             <div className={css.pageWrapper}>
                 <div className={css.headerWrapper}>
                     <h1>Option Chain</h1>
-                    <NewTradeSettingsWidget currentExpiryOptionChain={optionChain} marketData={marketData} indiesConfig={indiesConfig} index={index} />
+                    <NewTradeSettingsWidget currentExpiryOptionChain={optionChain} marketData={marketData} indiesConfig={indiesConfig} index={index} user={user} indexLTP={indexLTP} />
                     <div className={css.chooseIndex}>
                         Switch Index
                         <div className={css.indexList}>
@@ -49,14 +69,20 @@ export default function OptionChain({ marketData, optionChainData }: any) {
                             })}
                         </div>
                     </div>
-                    <OptionChainWidget optionChain={optionChain} marketData={marketData} />
+                    <OptionChainWidget optionChain={optionChain} marketData={marketData} ATMStrikePrice={ATMStrikePrice} />
                 </div>
             </div>
         </div>
     )
 }
 
-const OptionChainWidget = ({ optionChain, marketData }: any) => {
+const OptionChainWidget = ({ optionChain, marketData, ATMStrikePrice }: any) => {
+    const [_ATMStrikePrice, setATMStrikePrice] = useState<any>([])
+
+    useEffect(() => {
+        if (!ATMStrikePrice) return
+        setATMStrikePrice([ATMStrikePrice[0].CE, ATMStrikePrice[0].PE])
+    }, [ATMStrikePrice])
     return (
         <table className={tableStyle.table}>
             <thead>
@@ -70,7 +96,7 @@ const OptionChainWidget = ({ optionChain, marketData }: any) => {
                 {optionChain.length > 0 &&
                     optionChain.map((option: any, index: number) => {
                         return (
-                            <tr key={index}>
+                            <tr key={index} className={_ATMStrikePrice.includes(option.CE || option.PE) ? css.ATMStrikePriceAlteration : ""}>
                                 <td>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</td>
                                 <td>{option.strike}</td>
                                 <td>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</td>
@@ -82,11 +108,11 @@ const OptionChainWidget = ({ optionChain, marketData }: any) => {
     )
 }
 
-const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesConfig, index }: any) => {
+const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesConfig, index, user, indexLTP }: any) => {
     const [callOrPut, setCallOrPut] = useState(1)
     const [quantity, setQuantity] = useState(0)
-    const [optionPrice, setOptionPrice] = useState(0)
-    const [RiskToRewardRatio, setRiskToRewardRatio] = useState(0)
+    const [optionPrice, setOptionPrice] = useState<any>("")
+    const [riskToRewardRatio, setRiskToRewardRatio] = useState(0)
     const [stopLoss, setStopLoss] = useState(0)
     const [closestOption, setClosestOption] = useState(null)
     const [closestOptionStrikeSymbol, setClosestOptionStrikeSymbol] = useState<any>({})
@@ -94,6 +120,8 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     const [maxLoss, setMaxLoss] = useState(0)
     const [maxProfit, setMaxProfit] = useState(0)
     const [paceOrderResponse, setPlaceOrderResponse] = useState<any>(null)
+    const [positionTypes, setPositionTypes] = useState<any>([])
+    const [positionType, setPositionType] = useState<any>("")
 
     const onChangeSide = () => {
         const _side = callOrPut == 1 ? -1 : 1
@@ -112,10 +140,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setStopLoss(value)
     }
 
-    useEffect(() => {
-        onRefreshUpdateTradeInsights()
-    }, [callOrPut, quantity, optionPrice, RiskToRewardRatio, stopLoss, index])
-
     const onRefreshUpdateTradeInsights = () => {
         // first we will find the nearest strike price to the price provided by the user
         const nearestOption = findNearestStrikePrice(currentExpiryOptionChain, callOrPut == 1 ? "CE" : "PE", optionPrice)
@@ -125,29 +149,55 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         if (quantity !== 0 && optionPrice !== 0) {
             setFundsRequirement(quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`])
         }
-        if (RiskToRewardRatio !== 0 && stopLoss !== 0 && quantity !== 0 && optionPrice !== 0) {
+        if (riskToRewardRatio !== 0 && stopLoss !== 0 && quantity !== 0 && optionPrice !== 0) {
             setMaxLoss(quantity * stopLoss)
-            setMaxProfit(quantity * (RiskToRewardRatio * stopLoss))
+            setMaxProfit(quantity * (riskToRewardRatio * stopLoss))
         }
     }
 
-    function findNearestStrikePrice(options: any, side: string, targetPrice: number) {
-        const filteredOptions = options //.filter(option => option[side] === `BANKNIFTY231004${option.strike}${side}`)
+    function getATMStrikePrice() {
+        const currentIndexLTP = indexLTP[indiesConfig[index].name]
+        const roundOffPrice = roundToNearestMultiple(currentIndexLTP, indiesConfig[index].strikePriceGap)
+        const filteredOptions = currentExpiryOptionChain.filter((option: any) => option.strike == roundOffPrice)
+        return filteredOptions
+    }
+    function findNearestStrikePrice(options: any, side: string, targetPrice: any) {
 
-        if (filteredOptions.length === 0) {
-            console.error(`No options found for side ${side}`)
-            return null
+        if (targetPrice === "ATM") {
+            const atmStrikePrice = getATMStrikePrice()
+            if (atmStrikePrice.length === 0) {
+                console.error(`No options found for side ${side}`)
+                return null
+            } else {
+                const filteredOptions = atmStrikePrice //.filter(option => option[side] === `BANKNIFTY231004${option.strike}${side}`)
+                if (filteredOptions.length === 0) {
+                    console.error(`No options found for side ${side}`)
+                    return null
+                }
+                const nearestOption = filteredOptions.reduce((prev: any, curr: any) => {
+                    return Math.abs(curr[`${side}_LTP`] - targetPrice) < Math.abs(prev[`${side}_LTP`] - targetPrice) ? curr : prev
+                })
+                return nearestOption
+            }
+
+        }
+        else {
+            const filteredOptions = options //.filter(option => option[side] === `BANKNIFTY231004${option.strike}${side}`)
+            if (filteredOptions.length === 0) {
+                console.error(`No options found for side ${side}`)
+                return null
+            }
+            const nearestOption = filteredOptions.reduce((prev: any, curr: any) => {
+                return Math.abs(curr[`${side}_LTP`] - targetPrice) < Math.abs(prev[`${side}_LTP`] - targetPrice) ? curr : prev
+            })
+            return nearestOption
         }
 
-        const nearestOption = filteredOptions.reduce((prev: any, curr: any) => {
-            return Math.abs(curr[`${side}_LTP`] - targetPrice) < Math.abs(prev[`${side}_LTP`] - targetPrice) ? curr : prev
-        })
-
-        return nearestOption
     }
 
+    // ------------------| Button Click Functions  |------------------
     async function onPlaceOrder() {
-        if (quantity == 0 || optionPrice == 0 || RiskToRewardRatio == 0 || stopLoss == 0) return setPlaceOrderResponse("Please fill all the fields")
+        if (quantity == 0 || optionPrice == 0 || riskToRewardRatio == 0 || stopLoss == 0) return setPlaceOrderResponse("Please fill all the fields")
         if (closestOptionStrikeSymbol == "") return setPlaceOrderResponse("Please refresh the trade insights")
         if (quantity % indiesConfig[index].lotSize !== 0) return setPlaceOrderResponse("Quantity should be multiple of lot size")
         if (stopLoss > optionPrice) return setPlaceOrderResponse("Stop loss should be less than option price")
@@ -159,8 +209,8 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
             body: JSON.stringify({
                 symbol: closestOptionStrikeSymbol.fy,
                 quantity: quantity,
-                riskToReward: RiskToRewardRatio,
-                positionType: "scalpingPosition",
+                riskToReward: riskToRewardRatio,
+                positionType: "scalping",
                 stopLoss: stopLoss,
                 orderSide: 1, // Buy by default
             }),
@@ -169,19 +219,39 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setPlaceOrderResponse(JSON.stringify(sendOrderRes))
         console.log(sendOrderRes)
     }
+    // ------------------| Button Click Functions END  |------------------
 
+    // ------------------| useEffects  |------------------
+    useEffect(() => {
+        onRefreshUpdateTradeInsights()
+    }, [callOrPut, quantity, optionPrice, riskToRewardRatio, stopLoss, index])
+
+    useEffect(() => {
+        if (!user.serverData.positionTypes) return
+        const positionTypes = Object.keys(user.serverData.positionTypes)
+        setPositionTypes(positionTypes)
+    }, [])
+
+    useEffect(() => {
+        if (!user.positionTypeSettings[positionType]?.preferredOptionPrice) return
+        setOptionPrice(user.positionTypeSettings[positionType]?.preferredOptionPrice)
+        setRiskToRewardRatio(user.positionTypeSettings[positionType]?.riskToRewardRatio)
+    }, [positionType])
+
+    // ------------------| useEffects END  |------------------
     return (
         <>
             <div>Trade Setting</div>
             <div className={css.newTradeSettingsWidget}>
                 <div className={css.newTradeSettingsLeftChild}>
+                    <Selector label={"Position Type"} itemsList={positionTypes} selectionChanged={(item: any) => setPositionType(item)} />
                     <div className={css.newTradeSettingsWidgetChild}>
-                        <TextInput placeholder="Quantity " type="number" onChange={(value: any) => onChangeQuantity(value)} incrementalValue={indiesConfig[index].lotSize} />
-                        <TextInput placeholder="Option Price" onChange={(value: any) => onChangeOptionPrice(value)} />
+                        <NumberInput placeholder="Quantity" onChange={(value: any) => onChangeQuantity(value)} incrementalValue={indiesConfig[index].lotSize} maxValue={0} startValue={quantity} />
+                        <NumberInput placeholder="Option Price" onChange={(value: any) => onChangeOptionPrice(value)} incrementalValue={1} maxValue={0} startValue={optionPrice} />
                     </div>
                     <div className={css.newTradeSettingsWidgetChild}>
-                        <TextInput placeholder="RR Ratio" type="number" onChange={(value: any) => onChangeRiskToRewardRatio(value)} incrementalValue={1} />
-                        <TextInput placeholder="StopLoss" onChange={(value: any) => onChangeStopLoss(value)} />
+                        <NumberInput placeholder="RR Ratio" onChange={(value: any) => onChangeRiskToRewardRatio(value)} incrementalValue={1} maxValue={0} startValue={riskToRewardRatio} />
+                        <NumberInput placeholder="StopLoss" onChange={(value: any) => onChangeStopLoss(value)} incrementalValue={1} maxValue={0} startValue={stopLoss} />
                     </div>
                     <div className={css.newTradeSide}>
                         <button className={` ${callOrPut == 1 ? css.buySideButton : css.sellSideButton}`} onClick={() => onChangeSide()}>
@@ -205,75 +275,3 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     )
 }
 
-// ATP
-// :
-// 549.1
-// L2_LTT
-// :
-// 1686295237
-// LTQ
-// :
-// 25
-// ask
-// :
-// 511.9
-// bid
-// :
-// 510.8
-// ch
-// :
-// -15.5
-// chp
-// :
-// -2.94
-// cmd
-// :
-// {c: 511.55, h: 512.5, l: 504, o: 505.35, t: 1686295200, …}
-// description
-// :
-// "NSE:BANKNIFTY2361543700CE"
-// exchange
-// :
-// "NSE"
-// high_price
-// :
-// "630"
-// low_price
-// :
-// 448.6
-// lp
-// :
-// 511.55
-// marketStat
-// :
-// 2
-// open_price
-// :
-// 542.25
-// original_name
-// :
-// "NSE:BANKNIFTY2361543700CE"
-// prev_close_price
-// :
-// 527.05
-// short_name
-// :
-// "BANKNIFTY2361543700CE"
-// spread
-// :
-// 1.099999999999966
-// symbol
-// :
-// "NSE:BANKNIFTY2361543700CE"
-// tot_buy
-// :
-// 87550
-// tot_sell
-// :
-// 35400
-// tt
-// :
-// 1686295238
-// volume
-// :
-// 2520975

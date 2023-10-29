@@ -57,9 +57,11 @@ export default class UserWebsocket {
         this.socket.emit("subscribeMarketAlerts", { sessionId: this.token })
         this.socket.on("marketAlerts", (data: any) => {
             const parsedData = JSON.parse(data)
-            console.log(parsedData)
             const message = parsedData.message
-            log.info(message)
+            if (message) log.info(message)
+            if (parsedData.status == "triggered") {
+                playSound()
+            }
         })
     }
     public disconnect() {

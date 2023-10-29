@@ -24,6 +24,12 @@
     width: 100%;
 }
 
+
+.ATMStrikePriceAlteration {
+    background-color: var(--primary-color);
+    border: none;
+}
+
 /* newTradeSettingsWidget */
 .newTradeSettingsWidget {
     display: flex;

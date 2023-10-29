@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react"
 import style from "./style.module.css"
-const NumberInput = ({ placeholder: label, onChange, incrementalValue, maxValue, startValue }: any) => {
+interface NumberInputProps {
+    placeholder: string
+    onChange: any
+    incrementalValue: number
+    maxValue: number
+    startValue: number
+}
+const NumberInput = ({ placeholder: label, onChange, incrementalValue, maxValue, startValue }: NumberInputProps) => {
     const [value, setValue] = useState<any>(startValue)
 
     useEffect(() => {
@@ -10,10 +17,12 @@ const NumberInput = ({ placeholder: label, onChange, incrementalValue, maxValue,
     function onValueChange(_value: any) {
         if (_value == "add") {
             const currentValue = parseInt(value) || 0
-            if (currentValue + incrementalValue > maxValue) {
-                setValue(maxValue)
-                onChange(maxValue)
-                return
+            if (maxValue != 0) {
+                if (currentValue + incrementalValue > maxValue) {
+                    setValue(maxValue)
+                    onChange(maxValue)
+                    return
+                }
             }
             onChange(currentValue + incrementalValue)
             setValue(currentValue + incrementalValue)

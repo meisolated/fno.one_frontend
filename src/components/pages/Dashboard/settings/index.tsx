@@ -7,10 +7,10 @@ import style from "./style.module.css"
 export default function Settings() {
     // ---- State Variables ----
     const [positionType, setPositionType] = useState<any>({
-        longPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
-        scalpingPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
-        swingPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
-        expiryPosition: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        long: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        scalping: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        swing: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        expiry: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
     })
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)
@@ -84,15 +84,10 @@ export default function Settings() {
     }, [positionType, moneyManager])
 
     useEffect(() => {
-        // this useEffect is causing a problem
-        /**
-         * next-dev.js:20 Warning: A component is changing a controlled input to be uncontrolled. This is likely caused by the value changing from a defined to undefined, which should not happen.
-         * Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
-         */
-        onPositionTypeChange("longPosition", positionType.longPosition.percentageOfFundsToUse)
-        onPositionTypeChange("scalpingPosition", positionType.scalpingPosition.percentageOfFundsToUse)
-        onPositionTypeChange("swingPosition", positionType.swingPosition.percentageOfFundsToUse)
-        onPositionTypeChange("expiryPosition", positionType.expiryPosition.percentageOfFundsToUse)
+        onPositionTypeChange("long", positionType.long.percentageOfFundsToUse)
+        onPositionTypeChange("scalping", positionType.scalping.percentageOfFundsToUse)
+        onPositionTypeChange("swing", positionType.swing.percentageOfFundsToUse)
+        onPositionTypeChange("expiry", positionType.expiry.percentageOfFundsToUse)
     }, [moneyManager])
 
     useEffect(() => {
@@ -127,23 +122,23 @@ export default function Settings() {
                                 <a>Long Position</a>
                             </div>
                             <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.longPosition.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("longPosition", value)}
+                                placeholder={`Percentage % [₹ ${positionType.long.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("long", value)}
                                 incrementalValue={5}
                                 maxValue={100}
-                                startValue={positionType.longPosition.percentageOfFundsToUse}
+                                startValue={positionType.long.percentageOfFundsToUse}
                             />
                             <TextInput
                                 placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("longPosition", value)}
-                                startValue={positionType.longPosition.preferredOptionPrice}
+                                onChange={(value: any) => onPreferredOptionPriceChange("long", value)}
+                                startValue={positionType.long.preferredOptionPrice}
                             />
                             <NumberInput
                                 placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("longPosition", value)}
+                                onChange={(value: any) => onRiskToRewardRatioChange("long", value)}
                                 incrementalValue={1}
                                 maxValue={15}
-                                startValue={positionType.longPosition.riskToRewardRatio}
+                                startValue={positionType.long.riskToRewardRatio}
                             />
                         </div>
                         <div className={style.positionTypeSettingsItem}>
@@ -151,23 +146,23 @@ export default function Settings() {
                                 <a>Scalping Position</a>
                             </div>
                             <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.scalpingPosition.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("scalpingPosition", value)}
+                                placeholder={`Percentage % [₹ ${positionType.scalping.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("scalping", value)}
                                 incrementalValue={5}
                                 maxValue={100}
-                                startValue={positionType.scalpingPosition.percentageOfFundsToUse}
+                                startValue={positionType.scalping.percentageOfFundsToUse}
                             />
                             <TextInput
                                 placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("scalpingPosition", value)}
-                                startValue={positionType.scalpingPosition.preferredOptionPrice}
+                                onChange={(value: any) => onPreferredOptionPriceChange("scalping", value)}
+                                startValue={positionType.scalping.preferredOptionPrice}
                             />
                             <NumberInput
                                 placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("scalpingPosition", value)}
+                                onChange={(value: any) => onRiskToRewardRatioChange("scalping", value)}
                                 incrementalValue={1}
                                 maxValue={15}
-                                startValue={positionType.scalpingPosition.riskToRewardRatio}
+                                startValue={positionType.scalping.riskToRewardRatio}
                             />
                         </div>
 
@@ -176,23 +171,23 @@ export default function Settings() {
                                 <a>Swing Position</a>
                             </div>
                             <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.swingPosition.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("swingPosition", value)}
+                                placeholder={`Percentage % [₹ ${positionType.swing.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("swing", value)}
                                 maxValue={100}
                                 incrementalValue={5}
-                                startValue={positionType.swingPosition.percentageOfFundsToUse}
+                                startValue={positionType.swing.percentageOfFundsToUse}
                             />
                             <TextInput
                                 placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("swingPosition", value)}
-                                startValue={positionType.swingPosition.preferredOptionPrice}
+                                onChange={(value: any) => onPreferredOptionPriceChange("swing", value)}
+                                startValue={positionType.swing.preferredOptionPrice}
                             />
                             <NumberInput
                                 placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("swingPosition", value)}
+                                onChange={(value: any) => onRiskToRewardRatioChange("swing", value)}
                                 incrementalValue={1}
                                 maxValue={15}
-                                startValue={positionType.swingPosition.riskToRewardRatio}
+                                startValue={positionType.swing.riskToRewardRatio}
                             />
                         </div>
                         <div className={style.positionTypeSettingsItem}>
@@ -200,23 +195,23 @@ export default function Settings() {
                                 <a>Expiry Position</a>
                             </div>
                             <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.expiryPosition.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("expiryPosition", value)}
+                                placeholder={`Percentage % [₹ ${positionType.expiry.fundsToUse}]`}
+                                onChange={(value: any) => onPositionTypeChange("expiry", value)}
                                 maxValue={100}
                                 incrementalValue={5}
-                                startValue={positionType.expiryPosition.percentageOfFundsToUse}
+                                startValue={positionType.expiry.percentageOfFundsToUse}
                             />
                             <TextInput
                                 placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("expiryPosition", value)}
-                                startValue={positionType.expiryPosition.preferredOptionPrice}
+                                onChange={(value: any) => onPreferredOptionPriceChange("expiry", value)}
+                                startValue={positionType.expiry.preferredOptionPrice}
                             />
                             <NumberInput
                                 placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("expiryPosition", value)}
+                                onChange={(value: any) => onRiskToRewardRatioChange("expiry", value)}
                                 incrementalValue={1}
                                 maxValue={15}
-                                startValue={positionType.expiryPosition.riskToRewardRatio}
+                                startValue={positionType.expiry.riskToRewardRatio}
                             />
                         </div>
                         <div className="margin-top" />

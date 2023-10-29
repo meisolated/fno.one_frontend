@@ -16,6 +16,6 @@
         "incremental": true,
         "rootDir": "./src"
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/Widgets/Dashboard/settings/general.tss", "src/components/Widgets/Dashboard/settings/general.tss"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/pages/pages/settings/general.tss", "src/components/pages/pages/settings/general.tss"],
     "exclude": ["node_modules"]
 }

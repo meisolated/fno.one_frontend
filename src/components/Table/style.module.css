@@ -37,3 +37,13 @@
 .table tr:last-child {
   border-bottom: 2px solid #111;
 }
+
+.noRowsFound {
+  position: absolute;
+  width: 100%;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #444;
+}

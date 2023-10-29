@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Popup from "../../components/Popup"
-import ServerDown from "../../components/Widgets/ServerDown"
+import ServerDown from "../../components/pages/ServerDown"
 export default function TestPage(props: any) {
     const [popup, setPopup] = useState<boolean>(false)
     // function placeTestOrder() {
