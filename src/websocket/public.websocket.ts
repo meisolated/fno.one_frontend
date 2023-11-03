@@ -7,7 +7,11 @@ export default class PublicWebsocket {
     private token
     private setMarket
     private setLogs
-    constructor(token: string, setMarket: Function, setLogs: Function) {
+    private setConnectedSockets
+    private subscribedEvents = {
+        subscribeMarketDataUpdate: false,
+    }
+    constructor(token: string, setMarket: Function, setLogs: Function, setConnectedSockets: Function) {
         this.token = token
         this.socketOptions = {
             transports: ["websocket"],
@@ -20,6 +24,7 @@ export default class PublicWebsocket {
         this.setMarket = setMarket
         this.setLogs = setLogs
         this.socket = io(this.socketUrl, this.socketOptions)
+        this.setConnectedSockets = setConnectedSockets
     }
     public connect() {
         this.socket.connect()
@@ -28,11 +33,22 @@ export default class PublicWebsocket {
             this.setLogs((logs: any) => {
                 return [...logs, "Connected to public websocket"]
             })
+            if (!this.subscribedEvents.subscribeMarketDataUpdate) {
+                this.socket.emit("subscribeMarketDataUpdate", { sessionId: this.token })
+                this.subscribedEvents.subscribeMarketDataUpdate = true
+            }
+            this.setConnectedSockets((connectedSockets: any) => {
+                return { ...connectedSockets, public: true }
+            })
         })
         this.socket.on("disconnect", () => {
+            this.subscribedEvents.subscribeMarketDataUpdate = false
             log.warning("Disconnected from public websocket")
             this.setLogs((logs: any) => {
                 return [...logs, "Disconnected from public websocket"]
+            })
+            this.setConnectedSockets((connectedSockets: any) => {
+                return { ...connectedSockets, public: false }
             })
         })
         this.socket.on("error", (error: any) => {

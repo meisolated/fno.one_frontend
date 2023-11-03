@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
+import DraggableWidget from "../../components/Dragable"
 import Popup from "../../components/Popup"
-import ServerDown from "../../components/pages/ServerDown"
 export default function TestPage(props: any) {
     const [popup, setPopup] = useState<boolean>(false)
     // function placeTestOrder() {
@@ -46,8 +46,18 @@ export default function TestPage(props: any) {
     return (
         <div style={{ width: "100%", height: "100%", position: "absolute", alignItems: "center", textAlign: "center" }}>
             {/* <button onClick={placeTestOrder}>Place Test Order</button> */}
-            {popup && <Popup title="Confirmation Required" description={"Are you sure you want to execute this trade?"} buttons={["NO", "YES"]} onClose={onClose} />}
-            {/* <ServerDown /> */}
+            {/* {popup && <Popup title="Confirmation Required" description={"Are you sure you want to execute this trade?"} buttons={["NO", "YES"]} onClose={onClose} />} */}
+            <DraggableWidget Child={Child} title={"Market Alerts"} />
         </div>
+    )
+}
+
+const Child = () => {
+    return (
+        <>
+            <div style={{ width: "100%", height: "100%", position: "absolute", alignItems: "center", textAlign: "center" }}>
+                <h1>Child</h1>
+            </div>
+        </>
     )
 }

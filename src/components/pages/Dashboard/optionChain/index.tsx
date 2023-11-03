@@ -14,7 +14,7 @@ interface props {
     indexLTP: any
 }
 
-export default function OptionChain({ marketData, optionChainData, user, indexLTP, }: props) {
+export default function OptionChain({ marketData, optionChainData, user, indexLTP }: props) {
     // const indies = ["BANKNIFTY", "NIFTY", "FINNIFTY"]
     const [isLoading, setLoading] = useState(true)
     const [optionChain, setCurrentOptionChain] = useState<any>([])
@@ -162,7 +162,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         return filteredOptions
     }
     function findNearestStrikePrice(options: any, side: string, targetPrice: any) {
-
         if (targetPrice === "ATM") {
             const atmStrikePrice = getATMStrikePrice()
             if (atmStrikePrice.length === 0) {
@@ -179,9 +178,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                 })
                 return nearestOption
             }
-
-        }
-        else {
+        } else {
             const filteredOptions = options //.filter(option => option[side] === `BANKNIFTY231004${option.strike}${side}`)
             if (filteredOptions.length === 0) {
                 console.error(`No options found for side ${side}`)
@@ -192,7 +189,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
             })
             return nearestOption
         }
-
     }
 
     // ------------------| Button Click Functions  |------------------
@@ -274,4 +270,3 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         </>
     )
 }
-

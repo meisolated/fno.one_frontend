@@ -225,6 +225,29 @@
     border-radius: 5px;
 }
 
+/* Socket Connection Status */
+.socketConnectionStatusWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.redDot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #a1020f;
+    border: 2px solid #fff;
+}
+
+.greenDot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #05a141;
+    border: 2px solid #fff;
+}
+
 
 /* RIGHT SIDE CURRENT MARKET LTP */
 .content_header_right_index_current_price {

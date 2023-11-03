@@ -26,13 +26,16 @@ export default function Dashboard(props: any) {
     const [user, setUser] = useState({ image: "/anime-girl.gif" })
     const [logs, setLogs] = useState<Array<string>>([])
     const [marketData, setMarketData] = useState<any>({})
-    const [marketDataSocketConnected, setMarketDataSocketConnected] = useState(false)
     const [optionChainData, setOptionChainData] = useState<any>({})
     const [currentTime, setCurrentTime] = useState("")
     const [indexLTP, setIndexLTP] = useState<any>({})
     const [indies, setIndies] = useState<any>(["BANKNIFTY", "NIFTY", "FINNIFTY"])
     const [indiesConfig, setIndiesConfig] = useState<any>({})
     const [isTodayHoliday, setIsTodayHoliday] = useState(false)
+    const [connectedSockets, setConnectedSockets] = useState<any>({
+        user: false,
+        public: false,
+    })
 
     const navbarState = () => {
         localStorage.setItem("navbar", JSON.stringify(!navbar))
@@ -44,8 +47,8 @@ export default function Dashboard(props: any) {
     }
 
     async function socketInitializer() {
-        const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs)
-        const userWebsocket = new UserWebsocket(props.token, setLogs)
+        const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs, setConnectedSockets)
+        const userWebsocket = new UserWebsocket(props.token, setLogs, setConnectedSockets)
         publicWebSocket.connect()
         userWebsocket.connect()
     }
@@ -201,6 +204,10 @@ export default function Dashboard(props: any) {
                                 <div className={css.circle}>
                                     <Image className={css.profile_image} src={user.image ? user.image : "/anime-girl.gif"} alt="user-profile-image" width={60} height={60} />
                                 </div>
+                            </div>
+                            <div className={css.socketConnectionStatusWrapper}>
+                                {connectedSockets.user ? <div className={css.greenDot} /> : <div className={css.redDot} />}
+                                {connectedSockets.public ? <div className={css.greenDot} /> : <div className={css.redDot} />}
                             </div>
                         </div>
                     </div>

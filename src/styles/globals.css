@@ -140,3 +140,14 @@ body {
 .smallButton:hover {
     background-color: #0d4cc2;
 }
+
+/* margins */
+.margin-right-5px {
+    margin-right: 5px;
+}
+
+/* positions */
+.absoluteRight {
+    position: absolute;
+    right: 0px;
+}

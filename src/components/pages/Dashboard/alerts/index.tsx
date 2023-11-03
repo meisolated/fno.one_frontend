@@ -31,7 +31,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
     const [alertValueStartValue, setAlertValueStartValue] = useState(0)
 
     function onAlertPriceChange(_price: any) {
-        setAlertPrice(_price)
+        setAlertPrice(parseFloat(_price))
         const symbol = symbols.filter((_index: any) => _index.name == currentSymbol)[0].symbol
         const lp = marketData[symbol] ? marketData[symbol].lp : indexLTP[symbol]
 
@@ -50,8 +50,8 @@ export default function Alerts({ marketData, indexLTP }: props) {
     }
     function setAlert() {
         const symbol = symbols.filter((_index: any) => _index.name == currentSymbol)[0].symbol
-        if (alertPrice == 0) return
-        if (typeof alertPrice != "number") return
+        if (alertPrice == 0) return console.log("alertPrice", alertPrice)
+        if (typeof alertPrice != "number") return console.log("alertPrice typeof", typeof alertPrice, alertPrice)
         fetch("/internalApi/marketAlerts/create", {
             method: "POST",
             headers: {
@@ -86,6 +86,24 @@ export default function Alerts({ marketData, indexLTP }: props) {
                 console.log(err)
             })
     }
+    const deleteAlert = (id: any) => {
+        fetch("/internalApi/marketAlerts/delete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                alertId: id,
+            }),
+        })
+            .then(async (res) => {
+                console.log(res)
+                fetchAlerts()
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 
     useEffect(() => {
         fetchAlerts()
@@ -108,14 +126,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
                     })}
                 </div>
             </div>
-            <NumberInput
-                placeholder="Alert Price"
-                label="Alert Price"
-                onChange={(value: any) => onAlertPriceChange(value)}
-                incrementalValue={10}
-                maxValue={10000000}
-                startValue={alertValueStartValue}
-            />
+            <NumberInput placeholder="Alert Price" onChange={(value: any) => onAlertPriceChange(value)} incrementalValue={10} maxValue={10000000} startValue={alertValueStartValue} />
             <div className="margin-top" />
             <button className="smallButton" onClick={setAlert}>
                 Set Alert
@@ -142,7 +153,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
                                     <td>{alert.condition}</td>
                                     <td>{alert.alerted ? "YES" : "NO"}</td>
                                     <td>
-                                        <button>DELETE</button>
+                                        <button onClick={() => deleteAlert(alert._id)}>DELETE</button>
                                     </td>
                                 </tr>
                             )
