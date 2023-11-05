@@ -1,34 +1,50 @@
 import Head from "next/head"
 import { useEffect, useState } from "react"
+import { capitalizeFirstLetter } from "../../../../helper"
 import NumberInput from "../../../Input/Number"
 import TextInput from "../../../Input/Text"
 import Loading from "../../../Loading"
+import Selector from "../../../Selector"
 import style from "./style.module.css"
 export default function Settings() {
     // ---- State Variables ----
     const [positionType, setPositionType] = useState<any>({
-        long: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
-        scalping: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
-        swing: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
-        expiry: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0 },
+        long: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        scalping: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        swing: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        expiry: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
     })
-    const [isLoading, setIsLoading] = useState<boolean>(true)
-    const [saved, setSaved] = useState<boolean>(false)
+    const [moneyManager, setMoneyManager] = useState<any>({
+        percentageOfFundsToUse: 0,
+        fundsToUse: 0,
+        weekDays: {
+            monday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
+            tuesday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
+            wednesday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
+            thursday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
+            friday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
+        },
+    })
     const [funds, setFunds] = useState<any>({
         available: 0,
         total: 0,
         used: 0,
     })
-    const [moneyManager, setMoneyManager] = useState<any>({
-        percentageOfFundsToUse: 0,
-        fundsToUse: 0,
-    })
+
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [saved, setSaved] = useState<boolean>(false)
+    const [weekDaysList, setWeekDaysList] = useState<any>(["monday", "tuesday", "wednesday", "thursday", "friday"])
+    const [positionTypesList, setPositionTypesList] = useState<any>(["Long", "Scalping", "Swing", "Expiry"])
+    const [currentDay, setCurrentDay] = useState<string>("monday")
     // ---- End of State Variables ----
 
     // ---- Functions ----
     function onPositionTypeChange(_positionType: string, value: number) {
         setPositionType((prev: any) => {
-            return { ...prev, [_positionType]: { ...positionType[_positionType], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) } }
+            return {
+                ...prev,
+                [_positionType]: { ...positionType[_positionType], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.weekDays[currentDay].fundsToUse * value) / 100).toFixed(2) },
+            }
         })
     }
 
@@ -48,6 +64,16 @@ export default function Settings() {
             return { ...prev, [positionType]: { ...prev[positionType], riskToRewardRatio: value } }
         })
     }
+    function onStopLossChange(positionType: string, value: number) {
+        setPositionType((prev: any) => {
+            return { ...prev, [positionType]: { ...prev[positionType], stopLoss: value } }
+        })
+    }
+    function onWeekDaysPercentageOfFundsToUseChange(day: string, value: number) {
+        setMoneyManager((prev: any) => {
+            return { ...prev, weekDays: { ...prev.weekDays, [day]: { ...prev.weekDays[day], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) } } }
+        })
+    }
 
     // ---- Button Clicks Functions ----
     function onPositionTypeSaveButtonClicked() {
@@ -65,8 +91,6 @@ export default function Settings() {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log(positionType)
-                console.log(data)
                 setSaved(true)
             })
     }
@@ -74,7 +98,7 @@ export default function Settings() {
 
     // ---- End of Functions ----
 
-    // ---- Effects ----
+    // ---- Use Effects ----
     useEffect(() => {
         if (saved) {
             setTimeout(() => {
@@ -84,11 +108,15 @@ export default function Settings() {
     }, [positionType, moneyManager])
 
     useEffect(() => {
-        onPositionTypeChange("long", positionType.long.percentageOfFundsToUse)
-        onPositionTypeChange("scalping", positionType.scalping.percentageOfFundsToUse)
-        onPositionTypeChange("swing", positionType.swing.percentageOfFundsToUse)
-        onPositionTypeChange("expiry", positionType.expiry.percentageOfFundsToUse)
-    }, [moneyManager])
+        positionTypesList.map((item: any, index: number) => {
+            return onPositionTypeChange(item.toLowerCase(), positionType[item.toLowerCase()].percentageOfFundsToUse)
+        })
+    }, [moneyManager, currentDay])
+    useEffect(() => {
+        weekDaysList.map((item: any, index: number) => {
+            return onWeekDaysPercentageOfFundsToUseChange(item.toLowerCase(), moneyManager.weekDays[item.toLowerCase()].percentageOfFundsToUse)
+        })
+    }, [moneyManager.percentageOfFundsToUse])
 
     useEffect(() => {
         setIsLoading(true)
@@ -98,13 +126,19 @@ export default function Settings() {
                 setPositionType(data.positionTypeSettings)
                 setMoneyManager(data.moneyManager)
                 setFunds(data.funds.fyers)
-                setTimeout(() => {
-                    setIsLoading(false)
-                }, 1000)
             })
+        fetch("/internalApi/serverData")
+            .then((res) => res.json())
+            .then(({ data }) => {
+                setWeekDaysList(data.weekDays)
+                setPositionTypesList(data.positionTypesList)
+            })
+        setTimeout(() => {
+            setIsLoading(false)
+        }, 1000)
     }, [])
 
-    // ---- End of Effects ----
+    // ---- End of Use Effects ----
     if (isLoading) return <Loading />
     return (
         <div className={style.pageWrapper}>
@@ -112,108 +146,46 @@ export default function Settings() {
                 <title>Settings</title>
             </Head>
             {/* <h1>Settings</h1> */}
+            <Selector label="Select Day" itemsList={weekDaysList} selectionChanged={(e: any) => setCurrentDay(e)} />
             <div className={style.settingsGrid}>
                 <div className={style.settingsGridItem}>
                     <h2>Position Type Settings</h2>
-                    <div>Percentage of Funds to Use</div>
                     <div className={style.positionTypeSettingsWrapper}>
-                        <div className={style.positionTypeSettingsItem}>
-                            <div className="text-center full-width underline">
-                                <a>Long Position</a>
-                            </div>
-                            <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.long.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("long", value)}
-                                incrementalValue={5}
-                                maxValue={100}
-                                startValue={positionType.long.percentageOfFundsToUse}
-                            />
-                            <TextInput
-                                placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("long", value)}
-                                startValue={positionType.long.preferredOptionPrice}
-                            />
-                            <NumberInput
-                                placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("long", value)}
-                                incrementalValue={1}
-                                maxValue={15}
-                                startValue={positionType.long.riskToRewardRatio}
-                            />
-                        </div>
-                        <div className={style.positionTypeSettingsItem}>
-                            <div className="text-center full-width underline">
-                                <a>Scalping Position</a>
-                            </div>
-                            <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.scalping.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("scalping", value)}
-                                incrementalValue={5}
-                                maxValue={100}
-                                startValue={positionType.scalping.percentageOfFundsToUse}
-                            />
-                            <TextInput
-                                placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("scalping", value)}
-                                startValue={positionType.scalping.preferredOptionPrice}
-                            />
-                            <NumberInput
-                                placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("scalping", value)}
-                                incrementalValue={1}
-                                maxValue={15}
-                                startValue={positionType.scalping.riskToRewardRatio}
-                            />
-                        </div>
-
-                        <div className={style.positionTypeSettingsItem}>
-                            <div className="text-center full-width underline">
-                                <a>Swing Position</a>
-                            </div>
-                            <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.swing.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("swing", value)}
-                                maxValue={100}
-                                incrementalValue={5}
-                                startValue={positionType.swing.percentageOfFundsToUse}
-                            />
-                            <TextInput
-                                placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("swing", value)}
-                                startValue={positionType.swing.preferredOptionPrice}
-                            />
-                            <NumberInput
-                                placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("swing", value)}
-                                incrementalValue={1}
-                                maxValue={15}
-                                startValue={positionType.swing.riskToRewardRatio}
-                            />
-                        </div>
-                        <div className={style.positionTypeSettingsItem}>
-                            <div className="text-center full-width underline">
-                                <a>Expiry Position</a>
-                            </div>
-                            <NumberInput
-                                placeholder={`Percentage % [₹ ${positionType.expiry.fundsToUse}]`}
-                                onChange={(value: any) => onPositionTypeChange("expiry", value)}
-                                maxValue={100}
-                                incrementalValue={5}
-                                startValue={positionType.expiry.percentageOfFundsToUse}
-                            />
-                            <TextInput
-                                placeholder={`Preferred Option Price`}
-                                onChange={(value: any) => onPreferredOptionPriceChange("expiry", value)}
-                                startValue={positionType.expiry.preferredOptionPrice}
-                            />
-                            <NumberInput
-                                placeholder={`RTR Ratio`}
-                                onChange={(value: any) => onRiskToRewardRatioChange("expiry", value)}
-                                incrementalValue={1}
-                                maxValue={15}
-                                startValue={positionType.expiry.riskToRewardRatio}
-                            />
-                        </div>
+                        {positionTypesList.map((item: any, index: number) => {
+                            return (
+                                <div className={style.positionTypeSettingsItem} key={index}>
+                                    <div className="text-center full-width underline">
+                                        <a>{capitalizeFirstLetter(item)} Position</a>
+                                    </div>
+                                    <NumberInput
+                                        placeholder={`Percentage % [₹ ${positionType[item.toLowerCase()].fundsToUse}]`}
+                                        onChange={(value: any) => onPositionTypeChange(item.toLowerCase(), value)}
+                                        incrementalValue={5}
+                                        maxValue={100}
+                                        startValue={positionType[item.toLowerCase()].percentageOfFundsToUse}
+                                    />
+                                    <TextInput
+                                        placeholder={`Preferred Option Price`}
+                                        onChange={(value: any) => onPreferredOptionPriceChange(item.toLowerCase(), value)}
+                                        startValue={positionType[item.toLowerCase()].preferredOptionPrice}
+                                    />
+                                    <NumberInput
+                                        placeholder={`RTR Ratio`}
+                                        onChange={(value: any) => onRiskToRewardRatioChange(item.toLowerCase(), value)}
+                                        incrementalValue={1}
+                                        maxValue={15}
+                                        startValue={positionType[item.toLowerCase()].riskToRewardRatio}
+                                    />
+                                    <NumberInput
+                                        placeholder={`Stop Loss`}
+                                        onChange={(value: any) => onStopLossChange(item.toLowerCase(), value)}
+                                        incrementalValue={2}
+                                        maxValue={0}
+                                        startValue={positionType[item.toLowerCase()].stopLoss}
+                                    />
+                                </div>
+                            )
+                        })}
                         <div className="margin-top" />
                         <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>
                             {saved ? "SAVED" : "SAVE"}
@@ -232,6 +204,26 @@ export default function Settings() {
                     />
                     <div className="margin-top" />
                     {/* <div className="margin-top" /> */}
+                    <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>
+                        {saved ? "SAVED" : "SAVE"}
+                    </div>
+                    <div className="margin-top" />
+                    <h2>Week Days Settings</h2>
+                    <div>Percentage of Funds to Use (FTU) based on week day</div>
+                    {weekDaysList.map((item: any, index: number) => {
+                        return (
+                            <div className={style.weekDaysSettingsItem} key={index}>
+                                <NumberInput
+                                    placeholder={`${capitalizeFirstLetter(item)} %  [₹ ${moneyManager.weekDays[item.toLowerCase()].fundsToUse}]`}
+                                    onChange={(value: any) => onWeekDaysPercentageOfFundsToUseChange(item.toLowerCase(), value)}
+                                    incrementalValue={5}
+                                    maxValue={100}
+                                    startValue={moneyManager.weekDays[item.toLowerCase()].percentageOfFundsToUse}
+                                />
+                            </div>
+                        )
+                    })}
+                    <div className="margin-top" />
                     <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>
                         {saved ? "SAVED" : "SAVE"}
                     </div>

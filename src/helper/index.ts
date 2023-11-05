@@ -5,4 +5,12 @@ const playSound = () => {
 function roundToNearestMultiple(number: number, multiple: number) {
     return Math.round(number / multiple) * multiple
 }
-export { playSound, roundToNearestMultiple }
+
+function capitalizeFirstLetter(str: string) {
+    if (str.length === 0) {
+        return str
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+export { capitalizeFirstLetter, playSound, roundToNearestMultiple }

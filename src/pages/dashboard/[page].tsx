@@ -80,6 +80,7 @@ export default function Dashboard(props: any) {
         async function fetchData() {
             setLoading(true)
             const _userData = await fetch("/internalApi/user/get")
+            const _serverData = await fetch("/internalApi/serverData")
             const _data = await _userData.json()
             setIsTodayHoliday(_data.data.todayHoliday)
             setUser(_data.data)

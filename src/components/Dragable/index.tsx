@@ -54,7 +54,6 @@ const DraggableWidget = ({ Child, title }: any) => {
             style={{
                 position: "absolute",
                 transform: `translate(${position.x}px, ${position.y}px)`,
-
             }}
         >
             <div className={css.draggableArea} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>

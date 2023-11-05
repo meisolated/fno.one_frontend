@@ -1,8 +1,7 @@
 import Head from "next/head"
-import { use, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { roundToNearestMultiple } from "../../../../helper"
 import NumberInput from "../../../Input/Number"
-import TextInput from "../../../Input/Text"
 import Selector from "../../../Selector"
 import tableStyle from "../../../Table/style.module.css"
 import css from "./style.module.css"
@@ -75,43 +74,12 @@ export default function OptionChain({ marketData, optionChainData, user, indexLT
         </div>
     )
 }
-
-const OptionChainWidget = ({ optionChain, marketData, ATMStrikePrice }: any) => {
-    const [_ATMStrikePrice, setATMStrikePrice] = useState<any>([])
-
-    useEffect(() => {
-        if (!ATMStrikePrice) return
-        setATMStrikePrice([ATMStrikePrice[0].CE, ATMStrikePrice[0].PE])
-    }, [ATMStrikePrice])
-    return (
-        <table className={tableStyle.table}>
-            <thead>
-                <tr>
-                    <th>CE</th>
-                    <th>STRIKE PRICE</th>
-                    <th>PE</th>
-                </tr>
-            </thead>
-            <tbody>
-                {optionChain.length > 0 &&
-                    optionChain.map((option: any, index: number) => {
-                        return (
-                            <tr key={index} className={_ATMStrikePrice.includes(option.CE || option.PE) ? css.ATMStrikePriceAlteration : ""}>
-                                <td>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</td>
-                                <td>{option.strike}</td>
-                                <td>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</td>
-                            </tr>
-                        )
-                    })}
-            </tbody>
-        </table>
-    )
-}
-
 const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesConfig, index, user, indexLTP }: any) => {
+    // ------------------| States  |------------------
     const [callOrPut, setCallOrPut] = useState(1)
     const [quantity, setQuantity] = useState(0)
-    const [optionPrice, setOptionPrice] = useState<any>("")
+    const [userOptionPrice, setUserOptionPrice] = useState<any>("")
+    const [currentOptionPrice, setCurrentOptionPrice] = useState<any>(0)
     const [riskToRewardRatio, setRiskToRewardRatio] = useState(0)
     const [stopLoss, setStopLoss] = useState(0)
     const [closestOption, setClosestOption] = useState(null)
@@ -122,7 +90,12 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     const [paceOrderResponse, setPlaceOrderResponse] = useState<any>(null)
     const [positionTypes, setPositionTypes] = useState<any>([])
     const [positionType, setPositionType] = useState<any>("")
+    const [fundsToUse, setFundsToUse] = useState<any>(0)
+    const [lotSize, setLotSize] = useState<any>(0)
 
+    // ------------------| States END  |------------------
+
+    // ------------------| Functions  |------------------
     const onChangeSide = () => {
         const _side = callOrPut == 1 ? -1 : 1
         setCallOrPut(_side)
@@ -131,7 +104,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setQuantity(value)
     }
     const onChangeOptionPrice = (value: any) => {
-        setOptionPrice(value)
+        setUserOptionPrice(value)
     }
     const onChangeRiskToRewardRatio = (value: any) => {
         setRiskToRewardRatio(value)
@@ -140,18 +113,26 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setStopLoss(value)
     }
 
+    const calculateQuantity = (fundsToUse: any, optionPrice: any, lotSize: any) => {
+        const quantity = fundsToUse / optionPrice
+        return Math.floor(quantity / lotSize) * lotSize || 0
+    }
+
     const onRefreshUpdateTradeInsights = () => {
         // first we will find the nearest strike price to the price provided by the user
-        const nearestOption = findNearestStrikePrice(currentExpiryOptionChain, callOrPut == 1 ? "CE" : "PE", optionPrice)
-        if (!nearestOption) return
+        const nearestOption = findNearestStrikePrice(currentExpiryOptionChain, callOrPut == 1 ? "CE" : "PE", userOptionPrice)
+        if (!nearestOption) return console.log("No nearest option found")
         setClosestOption(nearestOption)
         setClosestOptionStrikeSymbol({ fy: nearestOption.other.fy[callOrPut == 1 ? "CE" : "PE"], trueData: nearestOption[callOrPut == 1 ? "CE" : "PE"] })
-        if (quantity !== 0 && optionPrice !== 0) {
-            setFundsRequirement(quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`])
+        const optionPriceToUse = nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]
+        const _quantity = calculateQuantity(fundsToUse, optionPriceToUse, lotSize)
+        setQuantity(_quantity)
+        if (_quantity !== 0 && optionPriceToUse !== 0) {
+            setFundsRequirement(_quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`])
         }
-        if (riskToRewardRatio !== 0 && stopLoss !== 0 && quantity !== 0 && optionPrice !== 0) {
-            setMaxLoss(quantity * stopLoss)
-            setMaxProfit(quantity * (riskToRewardRatio * stopLoss))
+        if (riskToRewardRatio !== 0 && stopLoss !== 0 && _quantity !== 0 && optionPriceToUse !== 0) {
+            setMaxLoss(_quantity * stopLoss)
+            setMaxProfit(_quantity * (riskToRewardRatio * stopLoss))
         }
     }
 
@@ -190,13 +171,13 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
             return nearestOption
         }
     }
-
+    // ------------------| Functions END  |------------------
     // ------------------| Button Click Functions  |------------------
     async function onPlaceOrder() {
-        if (quantity == 0 || optionPrice == 0 || riskToRewardRatio == 0 || stopLoss == 0) return setPlaceOrderResponse("Please fill all the fields")
+        if (quantity == 0 || userOptionPrice == 0 || riskToRewardRatio == 0 || stopLoss == 0) return setPlaceOrderResponse("Please fill all the fields")
         if (closestOptionStrikeSymbol == "") return setPlaceOrderResponse("Please refresh the trade insights")
         if (quantity % indiesConfig[index].lotSize !== 0) return setPlaceOrderResponse("Quantity should be multiple of lot size")
-        if (stopLoss > optionPrice) return setPlaceOrderResponse("Stop loss should be less than option price")
+        if (stopLoss > userOptionPrice) return setPlaceOrderResponse("Stop loss should be less than option price")
         const sendOrderReq = await fetch("/internalApi/placeOrder", {
             method: "POST",
             headers: {
@@ -220,7 +201,8 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     // ------------------| useEffects  |------------------
     useEffect(() => {
         onRefreshUpdateTradeInsights()
-    }, [callOrPut, quantity, optionPrice, riskToRewardRatio, stopLoss, index])
+        setLotSize(indiesConfig[index].lotSize)
+    }, [callOrPut, userOptionPrice, riskToRewardRatio, stopLoss, index])
 
     useEffect(() => {
         if (!user.serverData.positionTypes) return
@@ -228,11 +210,23 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setPositionTypes(positionTypes)
     }, [])
 
+    function fundsAllowedToUse(user: any) {
+        // const fundsToUseBasedOnDay = user.funds.fyers.available *
+    }
     useEffect(() => {
         if (!user.positionTypeSettings[positionType]?.preferredOptionPrice) return
-        setOptionPrice(user.positionTypeSettings[positionType]?.preferredOptionPrice)
+        setUserOptionPrice(user.positionTypeSettings[positionType]?.preferredOptionPrice)
         setRiskToRewardRatio(user.positionTypeSettings[positionType]?.riskToRewardRatio)
+        // const fundsAllowedToUseToday =
+        setFundsToUse(user.positionTypeSettings[positionType]?.fundsToUse)
+        setStopLoss(user.positionTypeSettings[positionType]?.stopLoss)
     }, [positionType])
+
+    useEffect(() => {
+        if (!closestOption) return
+        const optionPrice = marketData[closestOption[callOrPut == 1 ? "CE" : "PE"]]?.lp || closestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]
+        setCurrentOptionPrice(optionPrice)
+    }, [marketData, currentExpiryOptionChain, closestOption, callOrPut])
 
     // ------------------| useEffects END  |------------------
     return (
@@ -243,7 +237,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                     <Selector label={"Position Type"} itemsList={positionTypes} selectionChanged={(item: any) => setPositionType(item)} />
                     <div className={css.newTradeSettingsWidgetChild}>
                         <NumberInput placeholder="Quantity" onChange={(value: any) => onChangeQuantity(value)} incrementalValue={indiesConfig[index].lotSize} maxValue={0} startValue={quantity} />
-                        <NumberInput placeholder="Option Price" onChange={(value: any) => onChangeOptionPrice(value)} incrementalValue={1} maxValue={0} startValue={optionPrice} />
+                        <NumberInput placeholder="Option Price" onChange={(value: any) => onChangeOptionPrice(value)} incrementalValue={1} maxValue={0} startValue={userOptionPrice} />
                     </div>
                     <div className={css.newTradeSettingsWidgetChild}>
                         <NumberInput placeholder="RR Ratio" onChange={(value: any) => onChangeRiskToRewardRatio(value)} incrementalValue={1} maxValue={0} startValue={riskToRewardRatio} />
@@ -261,6 +255,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                 </div>
                 <div className={css.newTradeSettingsRightChild}>
                     <div>Closest Option: {closestOptionStrikeSymbol.fy}</div>
+                    <div>Current Option Price: {currentOptionPrice}</div>
                     <div>Funds Requirement: {fundsRequirement}</div>
                     <div>Max Loss: {maxLoss}</div>
                     <div>Max Profit: {maxProfit}</div>
@@ -268,5 +263,37 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                 </div>
             </div>
         </>
+    )
+}
+
+const OptionChainWidget = ({ optionChain, marketData, ATMStrikePrice }: any) => {
+    const [_ATMStrikePrice, setATMStrikePrice] = useState<any>([])
+
+    useEffect(() => {
+        if (!ATMStrikePrice) return
+        setATMStrikePrice([ATMStrikePrice[0].CE, ATMStrikePrice[0].PE])
+    }, [ATMStrikePrice])
+    return (
+        <table className={tableStyle.table}>
+            <thead>
+                <tr>
+                    <th>CE</th>
+                    <th>STRIKE PRICE</th>
+                    <th>PE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {optionChain.length > 0 &&
+                    optionChain.map((option: any, index: number) => {
+                        return (
+                            <tr key={index} className={_ATMStrikePrice.includes(option.CE || option.PE) ? css.ATMStrikePriceAlteration : ""}>
+                                <td>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</td>
+                                <td>{option.strike}</td>
+                                <td>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</td>
+                            </tr>
+                        )
+                    })}
+            </tbody>
+        </table>
     )
 }
