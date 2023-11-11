@@ -7,8 +7,8 @@ interface props {
     selectionChanged: any
 }
 export default function Selector({ label, itemsList, selectionChanged }: props) {
-    const [items, setItems] = useState(itemsList)
-    const [selectedItem, setSelectedItem] = useState(items[0])
+    const [items, setItems] = useState<any>([])
+    const [selectedItem, setSelectedItem] = useState<any>("")
     function onSelectionChange(item: any) {
         setSelectedItem(item)
         selectionChanged(item)
@@ -24,7 +24,7 @@ export default function Selector({ label, itemsList, selectionChanged }: props) 
             <div className={css.selectorList}>
                 {items.map((item: any, indexKey: any) => {
                     return (
-                        <div className={`${item == selectedItem ? css.selectorButton : css.selectorButtonActive}`} key={indexKey} onClick={() => onSelectionChange(item.toLowerCase())}>
+                        <div className={`${item == selectedItem ? css.selectorButtonActive : css.selectorButton}`} key={indexKey} onClick={() => onSelectionChange(item)}>
                             {capitalizeFirstLetter(item)}
                         </div>
                     )

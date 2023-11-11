@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react"
-
 import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/router"
+import { useEffect, useState } from "react"
 import Loading from "../../components/Loading"
 import NotificationSender from "../../components/Notification/notificationSender"
 import NotificationComponent from "../../components/Notification/requestNotificationPermission"
@@ -24,6 +23,7 @@ export default function Dashboard(props: any) {
     const [active, setActive] = useState("home")
     const [loading, setLoading] = useState(true)
     const [user, setUser] = useState({ image: "/anime-girl.gif" })
+    const [serverData, setServerData] = useState<any>({})
     const [logs, setLogs] = useState<Array<string>>([])
     const [marketData, setMarketData] = useState<any>({})
     const [optionChainData, setOptionChainData] = useState<any>({})
@@ -32,6 +32,8 @@ export default function Dashboard(props: any) {
     const [indies, setIndies] = useState<any>(["BANKNIFTY", "NIFTY", "FINNIFTY"])
     const [indiesConfig, setIndiesConfig] = useState<any>({})
     const [isTodayHoliday, setIsTodayHoliday] = useState(false)
+
+
     const [connectedSockets, setConnectedSockets] = useState<any>({
         user: false,
         public: false,
@@ -47,19 +49,25 @@ export default function Dashboard(props: any) {
     }
 
     async function socketInitializer() {
+
+    }
+
+    useEffect(() => {
+        // socketInitializer() 
         const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs, setConnectedSockets)
         const userWebsocket = new UserWebsocket(props.token, setLogs, setConnectedSockets)
         publicWebSocket.connect()
         userWebsocket.connect()
-    }
 
-    useEffect(() => {
-        socketInitializer()
+        function cleanup() {
+            publicWebSocket.disconnect()
+            userWebsocket.disconnect()
+        }
+        return cleanup
     }, [])
 
     useEffect(() => {
         if (loading) return
-
         indies.map((index: any, i: any) => {
             if (!marketData[indiesConfig[index].name]) return
             setIndexLTP((prev: any) => {
@@ -82,6 +90,8 @@ export default function Dashboard(props: any) {
             const _userData = await fetch("/internalApi/user/get")
             const _serverData = await fetch("/internalApi/serverData")
             const _data = await _userData.json()
+            const _serverDataJson = await _serverData.json()
+            setServerData(_serverDataJson.data)
             setIsTodayHoliday(_data.data.todayHoliday)
             setUser(_data.data)
             await fetch("/api/optionChain")
@@ -218,7 +228,7 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} />}
+                        {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />}
                         {active == "alerts" && <Alerts marketData={marketData} indexLTP={indexLTP} />}
                         {active == "settings" && <Settings />}
                         {active == "logs" && <Logs logs={logs} />}

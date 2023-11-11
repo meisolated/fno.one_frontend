@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import DraggableWidget from "../../components/Dragable"
 import Popup from "../../components/Popup"
+import Alert from "../../components/Alert"
 export default function TestPage(props: any) {
     const [popup, setPopup] = useState<boolean>(false)
     // function placeTestOrder() {
@@ -48,6 +49,7 @@ export default function TestPage(props: any) {
             {/* <button onClick={placeTestOrder}>Place Test Order</button> */}
             {/* {popup && <Popup title="Confirmation Required" description={"Are you sure you want to execute this trade?"} buttons={["NO", "YES"]} onClose={onClose} />} */}
             <DraggableWidget Child={Child} title={"Market Alerts"} />
+            <Alert position="top-right" type="success" message="Success" />
         </div>
     )
 }

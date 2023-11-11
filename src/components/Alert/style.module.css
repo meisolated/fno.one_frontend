@@ -1,0 +1,90 @@
+/* Alert.module.css */
+
+.alert {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.alertBox {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(0);
+    transition: transform 0.5s ease-in-out;
+    gap: 10px;
+}
+
+.topLeft {
+    top: 20px;
+    left: 20px;
+}
+
+.topRight {
+    top: 20px;
+    right: 20px;
+}
+
+.bottomLeft {
+    bottom: 20px;
+    left: 20px;
+}
+
+.bottomRight {
+    bottom: 20px;
+    right: 20px;
+}
+
+.middle {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.success {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.error {
+    background-color: #f44336;
+    color: #fff;
+}
+
+.info {
+    background-color: #2196f3;
+    color: #fff;
+}
+
+.show {
+    opacity: 1;
+}
+
+.hide {
+    opacity: 0;
+}
+
+.exitTopLeft {
+    transform: translateX(-200%);
+}
+
+.exitTopRight {
+    transform: translateX(200%);
+}
+
+.exitBottomLeft {
+    transform: translateX(-200%);
+}
+
+.exitBottomRight {
+    transform: translateX(200%);
+}
+
+.exitMiddle {
+    transform: scale(0);
+}

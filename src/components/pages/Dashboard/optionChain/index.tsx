@@ -11,9 +11,10 @@ interface props {
     optionChainData: any
     user: any
     indexLTP: any
+    serverData: any
 }
 
-export default function OptionChain({ marketData, optionChainData, user, indexLTP }: props) {
+export default function OptionChain({ marketData, optionChainData, user, indexLTP, serverData }: props) {
     // const indies = ["BANKNIFTY", "NIFTY", "FINNIFTY"]
     const [isLoading, setLoading] = useState(true)
     const [optionChain, setCurrentOptionChain] = useState<any>([])
@@ -55,7 +56,15 @@ export default function OptionChain({ marketData, optionChainData, user, indexLT
             <div className={css.pageWrapper}>
                 <div className={css.headerWrapper}>
                     <h1>Option Chain</h1>
-                    <NewTradeSettingsWidget currentExpiryOptionChain={optionChain} marketData={marketData} indiesConfig={indiesConfig} index={index} user={user} indexLTP={indexLTP} />
+                    <NewTradeSettingsWidget
+                        currentExpiryOptionChain={optionChain}
+                        marketData={marketData}
+                        indiesConfig={indiesConfig}
+                        index={index}
+                        user={user}
+                        indexLTP={indexLTP}
+                        serverData={serverData}
+                    />
                     <div className={css.chooseIndex}>
                         Switch Index
                         <div className={css.indexList}>
@@ -74,10 +83,13 @@ export default function OptionChain({ marketData, optionChainData, user, indexLT
         </div>
     )
 }
-const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesConfig, index, user, indexLTP }: any) => {
+const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesConfig, index, user, indexLTP, serverData }: any) => {
     // ------------------| States  |------------------
+    const [callOrPutList] = useState<any>(["call", "put"])
+    const [sideList] = useState<any>(["buy", "sell"])
     const [callOrPut, setCallOrPut] = useState(1)
     const [quantity, setQuantity] = useState(0)
+    const [side, setSide] = useState<any>("")
     const [userOptionPrice, setUserOptionPrice] = useState<any>("")
     const [currentOptionPrice, setCurrentOptionPrice] = useState<any>(0)
     const [riskToRewardRatio, setRiskToRewardRatio] = useState(0)
@@ -92,13 +104,18 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     const [positionType, setPositionType] = useState<any>("")
     const [fundsToUse, setFundsToUse] = useState<any>(0)
     const [lotSize, setLotSize] = useState<any>(0)
+    const [placeOrderButtonState, setPlaceOrderButtonState] = useState<any>(true)
 
     // ------------------| States END  |------------------
 
     // ------------------| Functions  |------------------
-    const onChangeSide = () => {
-        const _side = callOrPut == 1 ? -1 : 1
+    const onCallOrPutChange = (e: string) => {
+        const _side = e == "call" ? 1 : -1
         setCallOrPut(_side)
+    }
+    const onChangeSide = (e: string) => {
+        const _side = e == "buy" ? 1 : -1
+        setSide(_side)
     }
     const onChangeQuantity = (value: any) => {
         setQuantity(value)
@@ -113,9 +130,9 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setStopLoss(value)
     }
 
-    const calculateQuantity = (fundsToUse: any, optionPrice: any, lotSize: any) => {
+    const calculateQuantity = (fundsToUse: any, optionPrice: any) => {
         const quantity = fundsToUse / optionPrice
-        return Math.floor(quantity / lotSize) * lotSize || 0
+        return Math.floor(quantity / indiesConfig[index].lotSize) * indiesConfig[index].lotSize || 0
     }
 
     const onRefreshUpdateTradeInsights = () => {
@@ -125,10 +142,10 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setClosestOption(nearestOption)
         setClosestOptionStrikeSymbol({ fy: nearestOption.other.fy[callOrPut == 1 ? "CE" : "PE"], trueData: nearestOption[callOrPut == 1 ? "CE" : "PE"] })
         const optionPriceToUse = nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]
-        const _quantity = calculateQuantity(fundsToUse, optionPriceToUse, lotSize)
+        const _quantity = calculateQuantity(fundsToUse, optionPriceToUse)
         setQuantity(_quantity)
         if (_quantity !== 0 && optionPriceToUse !== 0) {
-            setFundsRequirement(_quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`])
+            setFundsRequirement(parseFloat((_quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]).toFixed(2)))
         }
         if (riskToRewardRatio !== 0 && stopLoss !== 0 && _quantity !== 0 && optionPriceToUse !== 0) {
             setMaxLoss(_quantity * stopLoss)
@@ -171,13 +188,22 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
             return nearestOption
         }
     }
+    function fundsAllowedToUse(user: any) {
+        const fundsToUseBasedOnPercentageOfFundsAllocated = parseFloat(((user.funds.fyers.available / 100) * user.moneyManager.percentageOfFundsToUse).toFixed(2))
+        if (serverData.todaysDay == "saturday" || serverData.todaysDay == "sunday") return fundsToUseBasedOnPercentageOfFundsAllocated / 2
+        const fundsToUseBasedOnWeekDay = parseFloat(((fundsToUseBasedOnPercentageOfFundsAllocated / 100) * user.moneyManager.weekDays[serverData.todaysDay].percentageOfFundsToUse).toFixed(2))
+        const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
+        return fundsToUseBasedOnPositionType
+    }
+
     // ------------------| Functions END  |------------------
     // ------------------| Button Click Functions  |------------------
     async function onPlaceOrder() {
+        if (!placeOrderButtonState) return
         if (quantity == 0 || userOptionPrice == 0 || riskToRewardRatio == 0 || stopLoss == 0) return setPlaceOrderResponse("Please fill all the fields")
         if (closestOptionStrikeSymbol == "") return setPlaceOrderResponse("Please refresh the trade insights")
-        if (quantity % indiesConfig[index].lotSize !== 0) return setPlaceOrderResponse("Quantity should be multiple of lot size")
-        if (stopLoss > userOptionPrice) return setPlaceOrderResponse("Stop loss should be less than option price")
+        if (quantity % indiesConfig[index].lotSize !== 0) return setPlaceOrderResponse(`Quantity should be multiple of lot size ${indiesConfig[index].lotSize}, current quantity ${quantity}`)
+        if (stopLoss < userOptionPrice) return setPlaceOrderResponse(`Stop loss should be less than option price ${userOptionPrice}, current stop loss ${stopLoss}`)
         const sendOrderReq = await fetch("/internalApi/placeOrder", {
             method: "POST",
             headers: {
@@ -189,19 +215,22 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                 riskToReward: riskToRewardRatio,
                 positionType: "scalping",
                 stopLoss: stopLoss,
-                orderSide: 1, // Buy by default
+                orderSide: side,
+                // callOrPut: callOrPut,
             }),
         })
         const sendOrderRes = await sendOrderReq.json()
         setPlaceOrderResponse(JSON.stringify(sendOrderRes))
         console.log(sendOrderRes)
+        setPlaceOrderButtonState(false)
+        setTimeout(() => setPlaceOrderButtonState(true), 10000)
     }
     // ------------------| Button Click Functions END  |------------------
 
     // ------------------| useEffects  |------------------
     useEffect(() => {
-        onRefreshUpdateTradeInsights()
         setLotSize(indiesConfig[index].lotSize)
+        onRefreshUpdateTradeInsights()
     }, [callOrPut, userOptionPrice, riskToRewardRatio, stopLoss, index])
 
     useEffect(() => {
@@ -210,16 +239,12 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setPositionTypes(positionTypes)
     }, [])
 
-    function fundsAllowedToUse(user: any) {
-        // const fundsToUseBasedOnDay = user.funds.fyers.available *
-    }
     useEffect(() => {
         if (!user.positionTypeSettings[positionType]?.preferredOptionPrice) return
         setUserOptionPrice(user.positionTypeSettings[positionType]?.preferredOptionPrice)
         setRiskToRewardRatio(user.positionTypeSettings[positionType]?.riskToRewardRatio)
-        // const fundsAllowedToUseToday =
-        setFundsToUse(user.positionTypeSettings[positionType]?.fundsToUse)
         setStopLoss(user.positionTypeSettings[positionType]?.stopLoss)
+        setFundsToUse(fundsAllowedToUse(user))
     }, [positionType])
 
     useEffect(() => {
@@ -229,6 +254,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     }, [marketData, currentExpiryOptionChain, closestOption, callOrPut])
 
     // ------------------| useEffects END  |------------------
+    if (!user) return <div>Loading...</div>
     return (
         <>
             <div>Trade Setting</div>
@@ -244,12 +270,14 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                         <NumberInput placeholder="StopLoss" onChange={(value: any) => onChangeStopLoss(value)} incrementalValue={1} maxValue={0} startValue={stopLoss} />
                     </div>
                     <div className={css.newTradeSide}>
-                        <button className={` ${callOrPut == 1 ? css.buySideButton : css.sellSideButton}`} onClick={() => onChangeSide()}>
-                            {callOrPut == 1 ? "CALL" : "PUT"} SIDE
-                        </button>
+                        {/* <button className={` ${callOrPut == 1 ? css.callButton : css.putButton}`} onClick={() => onChangeSide()}>
+                            {callOrPut == 1 ? "CALL" : "PUT"}
+                        </button> */}
+                        <Selector label="Side" itemsList={sideList} selectionChanged={(e: string) => onChangeSide(e)} />
+                        <Selector label="Call Or Put" itemsList={callOrPutList} selectionChanged={(e: string) => onCallOrPutChange(e)} />
                     </div>
                     <div>{paceOrderResponse}</div>
-                    <button onClick={onPlaceOrder} className={css.placeOrderButton}>
+                    <button onClick={onPlaceOrder} className={`${placeOrderButtonState ? css.placeOrderButton : css.disabledPlaceOrderButton}`}>
                         Place Order
                     </button>
                 </div>
@@ -259,7 +287,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                     <div>Funds Requirement: {fundsRequirement}</div>
                     <div>Max Loss: {maxLoss}</div>
                     <div>Max Profit: {maxProfit}</div>
-                    <button onClick={onRefreshUpdateTradeInsights}>refresh</button>
+                    {/* <button onClick={onRefreshUpdateTradeInsights}>refresh</button> */}
                 </div>
             </div>
         </>

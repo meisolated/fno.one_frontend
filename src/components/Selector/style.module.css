@@ -20,20 +20,20 @@
 }
 
 .selectorButton {
-    background-color: var(--primary-color);
+    background-color: var(--sidebar-color);
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 5px 10px;
     transition: 0.3s ease-in-out;
     cursor: pointer;
+    border: 1px solid rgb(58, 58, 58);
 }
 
 .selectorButtonActive {
-    background-color: #19c061;
+    background-color: var(--primary-color);
     cursor: pointer;
     color: #f8f8f8;
-    border-radius: 10px;
-    border: none;
+    border-radius: 8px;
     padding: 5px 10px;
     transition: 0.3s ease-in-out;
 }
@@ -41,14 +41,14 @@
 .selectorButton:hover {
     /*grow effect  */
     transform: scale(1.05);
-    box-shadow: 0 0 10px var(--primary-color);
+    box-shadow: 0 0 10px var(--sidebar-color);
     cursor: pointer;
 }
 
 .selectorButtonActive:hover {
     /*grow effect  */
     transform: scale(1.05);
-    box-shadow: 0 0 10px #19c061;
+    box-shadow: 0 0 10px var(--primary-color);
     cursor: pointer;
 }
 

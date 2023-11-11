@@ -34,7 +34,7 @@ export default function Settings() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)
     const [weekDaysList, setWeekDaysList] = useState<any>(["monday", "tuesday", "wednesday", "thursday", "friday"])
-    const [positionTypesList, setPositionTypesList] = useState<any>(["Long", "Scalping", "Swing", "Expiry"])
+    const [positionTypesList, setPositionTypesList] = useState<any>(["long", "scalping", "swing", "expiry"])
     const [currentDay, setCurrentDay] = useState<string>("monday")
     // ---- End of State Variables ----
 
@@ -193,8 +193,8 @@ export default function Settings() {
                     </div>
                 </div>
                 <div className={style.settingsGridItem}>
-                    <h2>Funds Settings</h2>
-                    <div>Percentage of Funds to Use</div>
+                    <h2>Money Manager</h2>
+                    <div>Percentage of Funds to be Allocated</div>
                     <NumberInput
                         placeholder={`Percentage %  [₹ ${moneyManager.fundsToUse}]`}
                         onChange={(value: any) => onPercentageOfFundsToUseChange(value)}
