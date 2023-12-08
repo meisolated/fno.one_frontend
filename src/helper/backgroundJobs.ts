@@ -1,3 +1,1 @@
-export default function backgroundJobs(marketData: any) {
-
-}
+export default function backgroundJobs(marketData: any) {}

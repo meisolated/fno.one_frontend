@@ -5,8 +5,10 @@ import NumberInput from "../../../Input/Number"
 import TextInput from "../../../Input/Text"
 import Loading from "../../../Loading"
 import Selector from "../../../Selector"
+import { useToast } from "../../../Toast/provider"
+import ToggleSwitch from "../../../ToggleSwitch"
 import style from "./style.module.css"
-export default function Settings() {
+export default function MoneyManager() {
     // ---- State Variables ----
     const [positionType, setPositionType] = useState<any>({
         long: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
@@ -15,8 +17,10 @@ export default function Settings() {
         expiry: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
     })
     const [moneyManager, setMoneyManager] = useState<any>({
+        mode: "percentage",
         percentageOfFundsToUse: 0,
         fundsToUse: 0,
+        maxLossPerDay: 0,
         weekDays: {
             monday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
             tuesday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
@@ -30,15 +34,33 @@ export default function Settings() {
         total: 0,
         used: 0,
     })
+    // const [moneyManager.mode, setFundsToUseMode] = useState<string>("percentage") // percentage, amount
 
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)
     const [weekDaysList, setWeekDaysList] = useState<any>(["monday", "tuesday", "wednesday", "thursday", "friday"])
     const [positionTypesList, setPositionTypesList] = useState<any>(["long", "scalping", "swing", "expiry"])
     const [currentDay, setCurrentDay] = useState<string>("monday")
+    const showToast = useToast()
     // ---- End of State Variables ----
 
     // ---- Functions ----
+    function onFundsToUseModeChange(newState: boolean) {
+        const _fundsToUseMode = newState ? "percentage" : "amount"
+        setMoneyManager((prev: any) => {
+            return { ...prev, mode: _fundsToUseMode }
+        })
+        if (_fundsToUseMode == "percentage") {
+            //calculate percentage of funds to use 
+            setMoneyManager((prev: any) => {
+                return { ...prev, percentageOfFundsToUse: ((moneyManager.fundsToUse / funds.available) * 100).toFixed(0) }
+            })
+        } else {
+            setMoneyManager((prev: any) => {
+                return { ...prev, fundsToUse: ((funds.available * moneyManager.percentageOfFundsToUse) / 100).toFixed(2) }
+            })
+        }
+    }
     function onPositionTypeChange(_positionType: string, value: number) {
         setPositionType((prev: any) => {
             return {
@@ -49,9 +71,16 @@ export default function Settings() {
     }
 
     async function onPercentageOfFundsToUseChange(value: number) {
-        setMoneyManager((prev: any) => {
-            return { ...prev, percentageOfFundsToUse: value, fundsToUse: ((funds.available * value) / 100).toFixed(2) }
-        })
+        if (moneyManager.mode == "percentage") {
+            setMoneyManager((prev: any) => {
+                return { ...prev, percentageOfFundsToUse: value, fundsToUse: ((funds.available * value) / 100).toFixed(2) }
+            })
+        } else {
+            setMoneyManager((prev: any) => {
+                return { ...prev, fundsToUse: value }
+            })
+        }
+
     }
 
     function onPreferredOptionPriceChange(positionType: string, value: number) {
@@ -92,6 +121,9 @@ export default function Settings() {
             .then((res) => res.json())
             .then((data) => {
                 setSaved(true)
+                showToast("Settings Saved", "success")
+            }).catch((err) => {
+                showToast("Error Saving Settings", "error")
             })
     }
     // ---- End of Button Clicks Functions ----
@@ -116,7 +148,7 @@ export default function Settings() {
         weekDaysList.map((item: any, index: number) => {
             return onWeekDaysPercentageOfFundsToUseChange(item.toLowerCase(), moneyManager.weekDays[item.toLowerCase()].percentageOfFundsToUse)
         })
-    }, [moneyManager.percentageOfFundsToUse])
+    }, [moneyManager.percentageOfFundsToUse, moneyManager.fundsToUse])
 
     useEffect(() => {
         setIsLoading(true)
@@ -194,13 +226,16 @@ export default function Settings() {
                 </div>
                 <div className={style.settingsGridItem}>
                     <h2>Money Manager</h2>
-                    <div>Percentage of Funds to be Allocated</div>
+                    <a>{moneyManager.mode == "percentage" ? "Percentage" : "Amount"} of Funds Allocated</a>
+                    <div className="margin-top" />
+                    <ToggleSwitch currentState={moneyManager.mode == "percentage" ? true : false} onStateChange={onFundsToUseModeChange} />
+                    <div className="margin-top" />
                     <NumberInput
-                        placeholder={`Percentage %  [₹ ${moneyManager.fundsToUse}]`}
+                        placeholder={`${moneyManager.mode == "percentage" ? `Percentage %  [₹ ${moneyManager.fundsToUse}]` : `Amount`}`}
                         onChange={(value: any) => onPercentageOfFundsToUseChange(value)}
                         incrementalValue={5}
-                        maxValue={100}
-                        startValue={moneyManager.percentageOfFundsToUse}
+                        maxValue={moneyManager.mode == "percentage" ? 100 : funds.available}
+                        startValue={moneyManager.mode == "percentage" ? moneyManager.percentageOfFundsToUse : moneyManager.fundsToUse}
                     />
                     <div className="margin-top" />
                     {/* <div className="margin-top" /> */}

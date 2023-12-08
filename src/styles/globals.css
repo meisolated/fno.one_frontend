@@ -30,13 +30,84 @@
 }
 
 :root {
-    --primary-color: #7752FE;
+    --primary-color: #00A6ED;
+    --primary-hover: #66C4F8;
+    --primary-dark: #007CBF;
+    --disabled-color: #B3D9F7;
+    --text-light: #FFFFFF;
+    --text-dark: #333333;
     --background-color: #131113;
     --sidebar-color: #1A191A;
     --popup-background-color: #1A191A;
     --logo-font: "THICCCBOI-ThicccAF";
     --z-index-popup: "100";
+
+
+    --red: #E60012;
+    --red-hover: #FF3340;
+    --red-dark: #C8102E;
+    --red-disabled: #FFC1C1;
+
+    --green: #4CAF50;
+    --green-hover: #66BB6A;
+    --green-dark: #388E3C;
+    --green-disabled: #A5D6A7;
+
+    --red-1: #FF0000;
+    --red-2: #E60012;
+    --red-3: #C8102E;
+    --red-4: #A6192E;
+    --red-5: #8C1515;
+
+    --green-1: #00FF00;
+    --green-2: #4CAF50;
+    --green-3: #388E3C;
+    --green-4: #2E7D32;
+    --green-5: #1B5E20;
+
+    --accent-color-1: #4CAF50;
+    /* Green */
+    --accent-color-2: #c57600;
+    /* Orange */
+    --accent-color-3: #bb003e;
+    /* Pink */
+    --accent-color-4: #FFC107;
+    /* Yellow */
+    --accent-color-5: #9C27B0;
+    /* Purple */
+    --accent-color-6: #FF5722;
+    /* Deep Orange */
+    --accent-color-7: #795548;
+    /* Brown */
+    --accent-color-8: #607D8B;
+    /* Blue Grey */
 }
+
+
+.background-accent-color-2 {
+    background-color: var(--accent-color-2) !important;
+
+}
+
+.background-accent-color-3 {
+    background-color: var(--accent-color-3) !important;
+}
+
+/* ------------------------------------------ Scroll -------------------------------------------*/
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+}
+
+::-webkit-scrollbar-track {
+    /* background-color: #f1f1f1; */
+}
+
+/* ---------------------------------------------------------------------- */
 
 body {
     padding: 0px;
@@ -117,6 +188,11 @@ body {
     margin-top: 20px;
 }
 
+.fit-content {
+    width: fit-content;
+
+}
+
 /* some buttons  */
 .disabledButton {
     cursor: not-allowed !important;
@@ -125,11 +201,11 @@ body {
 }
 
 .smallButton {
-    background-color: #126edd;
+    background-color: var(--primary-color);
     color: #fff;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 16px;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
@@ -138,7 +214,13 @@ body {
 
 
 .smallButton:hover {
-    background-color: #0d4cc2;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px var(--primary-hover);
+    cursor: pointer;
+}
+
+.fit-content {
+    width: fit-content !important;
 }
 
 /* margins */

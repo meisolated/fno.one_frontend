@@ -1,6 +1,6 @@
 .draggableWrapper {
     /* width fit-content and minimum 10% */
-    min-width: 20%;
+    min-width: 30%;
     min-height: 30%;
 
     /* If the content is larger than the 10%, allow it to grow */
@@ -9,6 +9,7 @@
     background: var(--sidebar-color);
     border-radius: 10px;
     overflow: hidden;
+    position: absolute;
 }
 
 .draggableArea {

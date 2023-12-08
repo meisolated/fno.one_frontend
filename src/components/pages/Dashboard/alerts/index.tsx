@@ -1,6 +1,8 @@
 import Head from "next/head"
 import { useEffect, useState } from "react"
 import NumberInput from "../../../Input/Number"
+import Loading from "../../../Loading"
+import Selector from "../../../Selector"
 import tableStyle from "../../../Table/style.module.css"
 import style from "./style.module.css"
 
@@ -24,11 +26,13 @@ export default function Alerts({ marketData, indexLTP }: props) {
             symbol: "NIFTY FIN SERVICE",
         },
     ]
+    const [symbolsNameList, setSymbolsNameList] = useState<any>([])
     const [currentSymbol, setCurrentSymbol] = useState<any>("BANK NIFTY")
     const [alertPrice, setAlertPrice] = useState(0)
     const [condition, setCondition] = useState("greaterThan")
     const [alertsList, setAlertsList] = useState<any>([])
     const [alertValueStartValue, setAlertValueStartValue] = useState(0)
+    const [loading, setLoading] = useState(true)
 
     function onAlertPriceChange(_price: any) {
         setAlertPrice(parseFloat(_price))
@@ -44,7 +48,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
     function onSymbolChange(index: any) {
         setCurrentSymbol(index)
         const symbol = symbols.filter((_index: any) => _index.name == index)[0].symbol
-        const lp = marketData[symbol] ? marketData[symbol].lp : indexLTP[symbol]
+        const lp = marketData[symbol] ? marketData[symbol].lp : indexLTP[symbol] || 0
         setAlertValueStartValue(lp)
         onAlertPriceChange(lp)
     }
@@ -81,6 +85,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
                 } else {
                     console.log(json)
                 }
+                setLoading(false)
             })
             .catch((err) => {
                 console.log(err)
@@ -106,31 +111,26 @@ export default function Alerts({ marketData, indexLTP }: props) {
     }
 
     useEffect(() => {
+        if (!marketData) return
+        if (!symbols) return
+        setSymbolsNameList(symbols.map((symbol) => symbol.name))
         fetchAlerts()
     }, [])
+    if (loading) return <Loading />
     return (
         <div>
             <Head>
                 <title>Alerts</title>
             </Head>
             <h1>Alerts</h1>
-            <div className={style.chooseIndex}>
-                Switch Symbol
-                <div className={style.indexList}>
-                    {symbols.map((_index: any, indexKey: any) => {
-                        return (
-                            <div className={`${_index.name == currentSymbol ? style.indexButtonActive : style.indexButton}`} key={indexKey} onClick={() => onSymbolChange(_index.name)}>
-                                {_index.name}
-                            </div>
-                        )
-                    })}
-                </div>
+            <div className="fit-content">
+                <Selector label="Symbol" itemsList={symbolsNameList} selectionChanged={(value: any) => onSymbolChange(value)} />
+                <NumberInput placeholder="Alert Price" onChange={(value: any) => onAlertPriceChange(value)} incrementalValue={10} maxValue={10000000} startValue={alertValueStartValue} />
+                <div className="margin-top" />
+                <button className="smallButton" onClick={setAlert}>
+                    Set Alert
+                </button>
             </div>
-            <NumberInput placeholder="Alert Price" onChange={(value: any) => onAlertPriceChange(value)} incrementalValue={10} maxValue={10000000} startValue={alertValueStartValue} />
-            <div className="margin-top" />
-            <button className="smallButton" onClick={setAlert}>
-                Set Alert
-            </button>
             <div className="margin-top" />
             <table className={tableStyle.table}>
                 <thead>

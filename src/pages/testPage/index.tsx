@@ -1,39 +1,22 @@
 import { useEffect, useState } from "react"
+import Alert from "../../components/Alert"
 import DraggableWidget from "../../components/Dragable"
 import Popup from "../../components/Popup"
-import Alert from "../../components/Alert"
+import { useToast } from "../../components/Toast/provider"
+import ToggleSwitch from "../../components/ToggleSwitch"
 export default function TestPage(props: any) {
     const [popup, setPopup] = useState<boolean>(false)
-    // function placeTestOrder() {
-    //     const orderReq: newOrder = {
-    //         symbol: "NSE:BANKNIFTY23O0445000CE",
-    //         qty: 15,
-    //         type: 2,
-    //         side: 1,
-    //         productType: "BO",
-    //         limitPrice: 0,
-    //         stopPrice: 0,
-    //         disclosedQty: 0,
-    //         validity: "DAY",
-    //         offlineOrder: false,
-    //         stopLoss: 70.0,
-    //         takeProfit: 150,
-    //     }
-    //     fetch("/internalApi/testPlaceOrder", {
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //         },
-    //         body: JSON.stringify(orderReq),
-    //     })
-    //         .then((res) => res.json())
-    //         .then((d) => {
-    //             console.log(d)
-    //         })
-    //         .catch((err) => {
-    //             console.log(err)
-    //         })
-    // }
+    const [serverMode, setServerMode] = useState<boolean>(false)
+    const showToast = useToast()
+    const handleToggleChange = (newState: any) => {
+        setServerMode(newState)
+        console.log(newState)
+    }
+
+    function _showToast() {
+        showToast("This is an error message", "success")
+    }
+
     function onClose(z: any) {
         setTimeout(() => {
             setPopup(false)
@@ -48,8 +31,12 @@ export default function TestPage(props: any) {
         <div style={{ width: "100%", height: "100%", position: "absolute", alignItems: "center", textAlign: "center" }}>
             {/* <button onClick={placeTestOrder}>Place Test Order</button> */}
             {/* {popup && <Popup title="Confirmation Required" description={"Are you sure you want to execute this trade?"} buttons={["NO", "YES"]} onClose={onClose} />} */}
-            <DraggableWidget Child={Child} title={"Market Alerts"} />
+            <DraggableWidget Child={Child} title={"Market Alerts"} closable={true} />
             <Alert position="top-right" type="success" message="Success" />
+            <ToggleSwitch currentState={serverMode} onStateChange={handleToggleChange} />
+            <button className="smallButton" onClick={_showToast}>
+                Show
+            </button>
         </div>
     )
 }

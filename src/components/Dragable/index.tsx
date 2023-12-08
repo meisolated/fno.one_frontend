@@ -3,7 +3,13 @@
 import { MouseEvent, useEffect, useState } from "react"
 import css from "./style.module.css"
 
-const DraggableWidget = ({ Child, title }: any) => {
+type DraggableWidgetProps = {
+    Child: any
+    title: string
+    closable?: boolean
+}
+
+const DraggableWidget = ({ Child, title, closable }: DraggableWidgetProps) => {
     const [isDragging, setIsDragging] = useState(false)
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
     const [startPosition, setStartPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
@@ -32,7 +38,7 @@ const DraggableWidget = ({ Child, title }: any) => {
         }
 
         if (isDragging) {
-            //@ts-ignore
+            // @ts-ignore
             window.addEventListener("mousemove", handleMouseMove)
             window.addEventListener("mouseup", handleMouseUp)
         } else {
@@ -49,18 +55,15 @@ const DraggableWidget = ({ Child, title }: any) => {
     }, [isDragging, position, startPosition])
     if (closed) return null
     return (
-        <div
-            className={css.draggableWrapper}
-            style={{
-                position: "absolute",
-                transform: `translate(${position.x}px, ${position.y}px)`,
-            }}
-        >
+        <div className={css.draggableWrapper} style={{ transform: `translate(${position.x}px, ${position.y}px)` }}>
             <div className={css.draggableArea} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
                 <h4>{title}</h4>
-                <div className={`absoluteRight margin-right-5px material-symbols-rounded`} onClick={() => setClosed(true)}>
-                    close
-                </div>
+
+                {closable && (
+                    <div className={`absoluteRight margin-right-5px material-symbols-rounded`} onClick={() => setClosed(true)}>
+                        close
+                    </div>
+                )}
             </div>
             <Child />
         </div>

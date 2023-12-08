@@ -1,6 +1,10 @@
 import io from "socket.io-client"
 import { playSound } from "../helper"
 import * as log from "../helper/consoleLog"
+
+/**
+ * We need to add some call back function
+ */
 export default class UserWebsocket {
     private socket
     private socketOptions
@@ -33,6 +37,10 @@ export default class UserWebsocket {
             this.setConnectedSockets((connectedSockets: any) => {
                 return { ...connectedSockets, user: true }
             })
+
+            this.socket.emit("subscribePositionUpdates", { sessionId: this.token })
+            this.socket.emit("subscribeOrderUpdate", { sessionId: this.token })
+            this.socket.emit("subscribeMarketAlerts", { sessionId: this.token })
         })
         this.socket.on("disconnect", () => {
             log.warning("Disconnected from user websocket")
@@ -50,35 +58,18 @@ export default class UserWebsocket {
             })
         })
 
-        this.socket.emit("subscribeTradeUpdates", { sessionId: this.token })
-        this.socket.emit("subscribeOrderUpdate", { sessionId: this.token })
-        this.socket.emit("subscribeMarketAlerts", { sessionId: this.token })
-
         this.socket.on("orderUpdate", (data: any) => {
-            console.log("orderUpdate")
             const parsedData = JSON.parse(data)
-            const message = parsedData.message
-            log.info(message)
-            this.setLogs((orderUpdates: any) => {
-                return [...orderUpdates, message]
-            })
-            if (message.includes("CONFIRMED")) {
-                playSound()
-            }
+            console.log(parsedData)
         })
 
         this.socket.on("marketAlerts", (data: any) => {
-            console.log("marketAlerts")
             const parsedData = JSON.parse(data)
-            if (parsedData.message) log.info(parsedData.message)
-            if (parsedData.status == "triggered") {
-                playSound()
-            }
+            console.log(parsedData)
         })
-        this.socket.on("tradeUpdates", (data: any) => {
-            console.log("tradeUpdates")
+        this.socket.on("positionUpdates", (data: any) => {
             const parsedData = JSON.parse(data)
-            if (parsedData.message) log.info(parsedData.message)
+            console.log(parsedData)
         })
 
         this.socket.on("pong", (data: any) => {

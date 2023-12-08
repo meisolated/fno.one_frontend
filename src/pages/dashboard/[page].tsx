@@ -8,10 +8,11 @@ import NotificationComponent from "../../components/Notification/requestNotifica
 import Alerts from "../../components/pages/Dashboard/alerts"
 import Home from "../../components/pages/Dashboard/home"
 import Logs from "../../components/pages/Dashboard/logs"
+import MoneyManager from "../../components/pages/Dashboard/moneyManager"
 import OptionChain from "../../components/pages/Dashboard/optionChain"
 import Orders from "../../components/pages/Dashboard/orders"
 import Positions from "../../components/pages/Dashboard/positions"
-import Settings from "../../components/pages/Dashboard/settings"
+import ServerSettings from "../../components/pages/Dashboard/serverSettings"
 import Trades from "../../components/pages/Dashboard/trades"
 import PublicWebsocket from "../../websocket/public.websocket"
 import UserWebsocket from "../../websocket/user.websocket"
@@ -32,7 +33,7 @@ export default function Dashboard(props: any) {
     const [indies, setIndies] = useState<any>(["BANKNIFTY", "NIFTY", "FINNIFTY"])
     const [indiesConfig, setIndiesConfig] = useState<any>({})
     const [isTodayHoliday, setIsTodayHoliday] = useState(false)
-
+    const [isTomorrowHoliday, setIsTomorrowHoliday] = useState(false)
 
     const [connectedSockets, setConnectedSockets] = useState<any>({
         user: false,
@@ -48,12 +49,7 @@ export default function Dashboard(props: any) {
         router.push(`/dashboard/${e}`)
     }
 
-    async function socketInitializer() {
-
-    }
-
     useEffect(() => {
-        // socketInitializer() 
         const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs, setConnectedSockets)
         const userWebsocket = new UserWebsocket(props.token, setLogs, setConnectedSockets)
         publicWebSocket.connect()
@@ -74,6 +70,9 @@ export default function Dashboard(props: any) {
                 if (typeof marketData[indiesConfig[index].name].lp == "undefined") return prev
                 return { ...prev, [indiesConfig[index].name]: marketData[indiesConfig[index].name].lp }
             })
+            // setOptionChainData((prev: any) => {
+
+            // })
         })
     }, [marketData])
 
@@ -93,6 +92,7 @@ export default function Dashboard(props: any) {
             const _serverDataJson = await _serverData.json()
             setServerData(_serverDataJson.data)
             setIsTodayHoliday(_data.data.todayHoliday)
+            setIsTomorrowHoliday(_data.data.tomorrowHoliday)
             setUser(_data.data)
             await fetch("/api/optionChain")
                 .then((res) => res.json())
@@ -169,11 +169,18 @@ export default function Dashboard(props: any) {
                             <div className={css.navbar_vertical_item_text}>Alerts</div>
                         </div>
                         <div className="divider margin-top-n-bottom" />
-                        <div className={`${css.navbar_vertical_item} ${active == "settings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("settings")}>
+                        <div className={`${css.navbar_vertical_item} ${active == "moneyManager" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("moneyManager")}>
                             <div className={css.navbar_vertical_item_icon}>
-                                <div className="material-symbols-rounded">settings</div>
+                                <div className="material-symbols-rounded">attach_money</div>
                             </div>
-                            <div className={css.navbar_vertical_item_text}>Settings</div>
+                            <div className={css.navbar_vertical_item_text}>Money Manager</div>
+                        </div>
+                        {/* <div className="divider margin-top-n-bottom" /> */}
+                        <div className={`${css.navbar_vertical_item} ${active == "serverSettings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("serverSettings")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded">tune</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Server Settings</div>
                         </div>
                         <div className={`${css.navbar_vertical_item} ${active == "logs" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("logs")}>
                             <div className={css.navbar_vertical_item_icon}>
@@ -230,7 +237,8 @@ export default function Dashboard(props: any) {
                         {active == "positions" && <Positions />}
                         {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />}
                         {active == "alerts" && <Alerts marketData={marketData} indexLTP={indexLTP} />}
-                        {active == "settings" && <Settings />}
+                        {active == "moneyManager" && <MoneyManager />}
+                        {active == "serverSettings" && <ServerSettings />}
                         {active == "logs" && <Logs logs={logs} />}
                         <NotificationComponent />
                         <NotificationSender />
@@ -238,13 +246,24 @@ export default function Dashboard(props: any) {
                     </div>
                 </div>
             </div>
-            {isTodayHoliday && (
-                <div className={css.footerNotification}>
-                    {" "}
+            {isTodayHoliday ? (
+                <div className={`${css.footerNotification} background-accent-color-3`}>
                     <div className={css.footerText}>
-                        <a className="uppercase big-text">Today is Holiday</a>
+                        {isTodayHoliday && isTomorrowHoliday ? (
+                            <a className="uppercase big-text">Today & Tomorrow is Holiday</a>
+                        ) : (
+                            isTodayHoliday && <a className="uppercase big-text">Today is Holiday</a>
+                        )}
                     </div>
                 </div>
+            ) : (
+                isTomorrowHoliday && (
+                    <div className={`${css.footerNotification} background-accent-color-2`}>
+                        <div className={css.footerText}>
+                            <a className="uppercase big-text">Tomorrow is Holiday</a>
+                        </div>
+                    </div>
+                )
             )}
         </>
     )

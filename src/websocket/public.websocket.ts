@@ -33,6 +33,7 @@ export default class PublicWebsocket {
             this.setConnectedSockets((connectedSockets: any) => {
                 return { ...connectedSockets, public: true }
             })
+            this.socket.emit("subscribeMarketDataUpdate", { sessionId: this.token })
         })
         this.socket.on("disconnect", () => {
             log.warning("Disconnected from public websocket")
@@ -49,10 +50,8 @@ export default class PublicWebsocket {
                 return [...logs, "Error from public websocket"]
             })
         })
-        this.socket.emit("subscribeMarketDataUpdate", { sessionId: this.token })
         this.socket.on("marketDataUpdate", (data: any) => {
             const parsedData = JSON.parse(data)
-            if (parsedData.message) log.info(parsedData.message)
             const symbol = parsedData.symbol || parsedData.Symbol
             this.setMarket((marketData: any) => {
                 return { ...marketData, [symbol]: parsedData }
