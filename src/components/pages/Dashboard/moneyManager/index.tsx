@@ -34,7 +34,7 @@ export default function MoneyManager() {
         total: 0,
         used: 0,
     })
-    // const [moneyManager.mode, setFundsToUseMode] = useState<string>("percentage") // percentage, amount
+    const [riskManager, setRiskManager] = useState<any>({})
 
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)

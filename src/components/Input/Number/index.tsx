@@ -68,9 +68,9 @@ const NumberInput = ({ placeholder: label, onChange, incrementalValue, maxValue,
         }
     }
     return (
-        <div className={style.formGroup}>
+        <div className={`${style.formGroup} fit-content`}>
             <input autoComplete="off" className={style.formField} placeholder={label} name={label} id={label} value={value} required onChange={(e: any) => onValueChange(e.target.value)} />
-            <label className={style.formLabel}>{label}</label>
+            <label className={`${style.formLabel} fit-content`}>{label}</label>
             <div className={style.formNumber}>
                 <button className={style.formNumberButton} onClick={() => onValueChange("sub")} onMouseDown={() => clickHold("down", "sub")} onMouseUp={() => clickHold("up", "sub")}>
                     -

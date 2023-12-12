@@ -228,6 +228,10 @@ body {
     margin-right: 5px;
 }
 
+.margin-left-5px {
+    margin-left: 5px;
+}
+
 /* positions */
 .absoluteRight {
     position: absolute;

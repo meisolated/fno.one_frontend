@@ -12,6 +12,7 @@ import MoneyManager from "../../components/pages/Dashboard/moneyManager"
 import OptionChain from "../../components/pages/Dashboard/optionChain"
 import Orders from "../../components/pages/Dashboard/orders"
 import Positions from "../../components/pages/Dashboard/positions"
+import RiskManager from "../../components/pages/Dashboard/riskManager"
 import ServerSettings from "../../components/pages/Dashboard/serverSettings"
 import Trades from "../../components/pages/Dashboard/trades"
 import PublicWebsocket from "../../websocket/public.websocket"
@@ -175,7 +176,13 @@ export default function Dashboard(props: any) {
                             </div>
                             <div className={css.navbar_vertical_item_text}>Money Manager</div>
                         </div>
-                        {/* <div className="divider margin-top-n-bottom" /> */}
+                        <div className={`${css.navbar_vertical_item} ${active == "riskManager" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("riskManager")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded">emergency</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Risk Manager</div>
+                        </div>
+                        <div className="divider margin-top-n-bottom" />
                         <div className={`${css.navbar_vertical_item} ${active == "serverSettings" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("serverSettings")}>
                             <div className={css.navbar_vertical_item_icon}>
                                 <div className="material-symbols-rounded">tune</div>
@@ -238,6 +245,7 @@ export default function Dashboard(props: any) {
                         {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />}
                         {active == "alerts" && <Alerts marketData={marketData} indexLTP={indexLTP} />}
                         {active == "moneyManager" && <MoneyManager />}
+                        {active == "riskManager" && <RiskManager />}
                         {active == "serverSettings" && <ServerSettings />}
                         {active == "logs" && <Logs logs={logs} />}
                         <NotificationComponent />

@@ -91,7 +91,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     const [fundsRequirement, setFundsRequirement] = useState<number>(0)
     const [maxLoss, setMaxLoss] = useState<number>(0)
     const [maxProfit, setMaxProfit] = useState<number>(0)
-    const [paceOrderResponse, setPlaceOrderResponse] = useState<any>(null)
     const [positionTypes, setPositionTypes] = useState<any>([])
     const [positionType, setPositionType] = useState<any>("")
     const [fundsToUse, setFundsToUse] = useState<number>(0)
@@ -149,15 +148,13 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         // if sell side check if the premium is greater than the stop loss * risk to reward ratio
         if (side == -1) {
             if (optionPriceToUse < stopLoss * riskToRewardRatio) {
-                setPlaceOrderResponse(`Option premium is greater than stop loss * risk to reward ratio`)
+                showToast(`Option premium is greater than stop loss * risk to reward ratio`, "error")
                 setPlaceOrderButtonState(false)
                 // setTimeout(() => setPlaceOrderButtonState(true), 10000)
             } else {
-                setPlaceOrderResponse(null)
                 setPlaceOrderButtonState(true)
             }
         } else {
-            setPlaceOrderResponse(null)
             setPlaceOrderButtonState(true)
         }
     }
@@ -210,10 +207,10 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     async function onPlaceOrder() {
         if (!placeOrderButtonState) return
         setPlaceOrderButtonState(false)
-        if (quantity == 0 || userOptionPrice == 0 || riskToRewardRatio == 0 || stopLoss == 0) return setPlaceOrderResponse("Please fill all the fields")
-        if (closestOptionStrikeSymbol == "") return setPlaceOrderResponse("Please refresh the trade insights")
-        if (quantity % indiesConfig[index].lotSize !== 0) return setPlaceOrderResponse(`Quantity should be multiple of lot size ${indiesConfig[index].lotSize}, current quantity ${quantity}`)
-        if (stopLoss > userOptionPrice) return setPlaceOrderResponse(`Stop loss should be less than option price ${userOptionPrice}, current stop loss ${stopLoss}`)
+        if (quantity == 0 || userOptionPrice == 0 || riskToRewardRatio == 0 || stopLoss == 0) return showToast("Please fill all the fields", "error")
+        if (closestOptionStrikeSymbol == "") return showToast("Please refresh the trade insights", "error")
+        if (quantity % indiesConfig[index].lotSize !== 0) return showToast(`Quantity should be multiple of lot size ${indiesConfig[index].lotSize}, current quantity ${quantity}`, "error")
+        if (stopLoss > userOptionPrice) return showToast(`Stop loss should be less than option price ${userOptionPrice}, current stop loss ${stopLoss}`, "error")
         const sendOrderReq = await fetch("/internalApi/placeOrder", {
             method: "POST",
             headers: {
@@ -231,7 +228,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
             }),
         })
         const sendOrderRes = await sendOrderReq.json()
-        setPlaceOrderResponse(JSON.stringify(sendOrderRes))
         if (sendOrderRes.code == 200) {
             showToast(sendOrderRes.message, "success")
         } else {
@@ -290,7 +286,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
                         <Selector label="Side" itemsList={sideList} selectionChanged={(e: string) => onChangeSide(e)} />
                         <Selector label="Call Or Put" itemsList={callOrPutList} selectionChanged={(e: string) => onCallOrPutChange(e)} />
                     </div>
-                    <div>{paceOrderResponse}</div>
                     <button onClick={onPlaceOrder} className={`${placeOrderButtonState ? css.placeOrderButton : css.disabledPlaceOrderButton}`}>
                         Place Order
                     </button>
