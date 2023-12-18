@@ -4,12 +4,12 @@ import { MouseEvent, useEffect, useState } from "react"
 import css from "./style.module.css"
 
 type DraggableWidgetProps = {
-    Child: any
+    children: React.ReactNode
     title: string
     closable?: boolean
 }
 
-const DraggableWidget = ({ Child, title, closable }: DraggableWidgetProps) => {
+const DraggableWidget = ({ children, title, closable }: DraggableWidgetProps) => {
     const [isDragging, setIsDragging] = useState(false)
     const [position, setPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
     const [startPosition, setStartPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 })
@@ -65,7 +65,7 @@ const DraggableWidget = ({ Child, title, closable }: DraggableWidgetProps) => {
                     </div>
                 )}
             </div>
-            <Child />
+            {children}
         </div>
     )
 }

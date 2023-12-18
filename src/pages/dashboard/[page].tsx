@@ -2,6 +2,8 @@ import Head from "next/head"
 import Image from "next/image"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import badgeCSS from "../../components/Badge/style.module.css"
+import DraggableWidget from "../../components/Dragable"
 import Loading from "../../components/Loading"
 import NotificationSender from "../../components/Notification/notificationSender"
 import NotificationComponent from "../../components/Notification/requestNotificationPermission"
@@ -35,6 +37,7 @@ export default function Dashboard(props: any) {
     const [indiesConfig, setIndiesConfig] = useState<any>({})
     const [isTodayHoliday, setIsTodayHoliday] = useState(false)
     const [isTomorrowHoliday, setIsTomorrowHoliday] = useState(false)
+    const [positions, setPositions] = useState<any>([])
 
     const [connectedSockets, setConnectedSockets] = useState<any>({
         user: false,
@@ -71,10 +74,16 @@ export default function Dashboard(props: any) {
                 if (typeof marketData[indiesConfig[index].name].lp == "undefined") return prev
                 return { ...prev, [indiesConfig[index].name]: marketData[indiesConfig[index].name].lp }
             })
-            // setOptionChainData((prev: any) => {
-
-            // })
         })
+        // setOptionChainData((prev: any) => {
+        //     indies.map((index: any, i: any) => {
+        //         const allIndiesOptionChain = prev.allIndiesOptionChain[index].forEach((option: any) => {
+        //             return { ...option, PE_LTP: marketData[option.PE], CE_LTP: marketData[option.CE] }
+        //         })
+        //         console.log(allIndiesOptionChain)
+        //         return { ...prev, allIndiesOptionChain: { ...prev.allIndiesOptionChain, [index]: allIndiesOptionChain } }
+        //     })
+        // })
     }, [marketData])
 
     useEffect(() => {
@@ -89,12 +98,15 @@ export default function Dashboard(props: any) {
             setLoading(true)
             const _userData = await fetch("/internalApi/user/get")
             const _serverData = await fetch("/internalApi/serverData")
-            const _data = await _userData.json()
+            const _positionsData = await fetch("/internalApi/user/getPositions")
+            const _userDataJson = await _userData.json()
             const _serverDataJson = await _serverData.json()
+            const _positionsDataJson = await _positionsData.json()
             setServerData(_serverDataJson.data)
-            setIsTodayHoliday(_data.data.todayHoliday)
-            setIsTomorrowHoliday(_data.data.tomorrowHoliday)
-            setUser(_data.data)
+            setIsTodayHoliday(_userDataJson.data.todayHoliday)
+            setIsTomorrowHoliday(_userDataJson.data.tomorrowHoliday)
+            setUser(_userDataJson.data)
+            setPositions(_positionsDataJson.data)
             await fetch("/api/optionChain")
                 .then((res) => res.json())
                 .then((d: any) => {
@@ -126,6 +138,11 @@ export default function Dashboard(props: any) {
                 <meta name="google" content="notranslate" />
                 <meta name="google" content="nositelinkssearchbox" key="sitelinks" />
             </Head>
+            {positions.length > 0 && (
+                <DraggableWidget title="Positions" closable={true}>
+                    <PositionsWidget positions={positions} />
+                </DraggableWidget>
+            )}
             <div className={css.dashboard}>
                 <div className={`${navbar ? css.lock_navbar_vertical : css.navbar_vertical}`}>
                     <div className={css.logo}>FnO</div>
@@ -274,6 +291,39 @@ export default function Dashboard(props: any) {
                 )
             )}
         </>
+    )
+}
+
+const PositionsWidget = ({ positions }: any) => {
+    return (
+        <div className={css.positionsWrapper}>
+            <div className={css.positionsHeader}>
+                <div>SYMBOL</div>
+                <div>QUANTITY</div>
+                <div>BUY AVG</div>
+                <div>SIDE</div>
+                <div>STOP LOSS</div>
+            </div>
+
+            {positions.length > 0 &&
+                positions.map((position: any, i: any) => {
+                    return (
+                        <div key={i} className={css.position}>
+                            <div className={css.positionInfo}>
+                                <div>{position.symbol}di</div>
+                                <div>{position.quantity}</div>
+                                <div>{position.price}</div>
+                                <div className={`${position.side == 1 ? badgeCSS.buyBadge : badgeCSS.sellBadge}`}>{position.side == 1 ? "BUY" : "SELL"}</div>
+                                <div>{position.price - position.stopLoss}</div>
+                            </div>
+                            <div className={css.positionStatus}>
+                                <div>PnL: {position.unRealizedProfit}</div>
+                                <div>{position.status}</div>
+                            </div>
+                        </div>
+                    )
+                })}
+        </div>
     )
 }
 

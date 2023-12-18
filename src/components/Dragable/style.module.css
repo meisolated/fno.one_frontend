@@ -1,15 +1,16 @@
 .draggableWrapper {
-    /* width fit-content and minimum 10% */
     min-width: 30%;
     min-height: 30%;
-
-    /* If the content is larger than the 10%, allow it to grow */
     width: fit-content;
-    height: fit-content;
+    height: -webkit-fill-available;
+    max-width: 50%;
+    max-height: 40%;
     background: var(--sidebar-color);
     border-radius: 10px;
     overflow: hidden;
     position: absolute;
+    z-index: 10000;
+    border: 1px solid #2B2B2B;
 }
 
 .draggableArea {

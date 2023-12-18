@@ -195,11 +195,19 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         }
     }
     function fundsAllowedToUse(user: any) {
+        if (serverData.todaysDay == "saturday" || serverData.todaysDay == "sunday") return user.funds.fyers.available || 0
         const fundsToUseBasedOnPercentageOfFundsAllocated = parseFloat(((user.funds.fyers.available / 100) * user.moneyManager.percentageOfFundsToUse).toFixed(2))
-        if (serverData.todaysDay == "saturday" || serverData.todaysDay == "sunday") return fundsToUseBasedOnPercentageOfFundsAllocated / 2
-        const fundsToUseBasedOnWeekDay = parseFloat(((fundsToUseBasedOnPercentageOfFundsAllocated / 100) * user.moneyManager.weekDays[serverData.todaysDay].percentageOfFundsToUse).toFixed(2))
-        const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
-        return fundsToUseBasedOnPositionType
+        if (user.moneyManager.mode == "percentage") {
+            const fundsToUseBasedOnWeekDay = parseFloat(((fundsToUseBasedOnPercentageOfFundsAllocated / 100) * user.moneyManager.weekDays[serverData.todaysDay].percentageOfFundsToUse).toFixed(2))
+            const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
+            console.log(fundsToUseBasedOnPositionType)
+            return fundsToUseBasedOnPositionType
+        } else {
+            const fundsToUseBasedOnWeekDay = parseFloat(user.moneyManager.weekDays[serverData.todaysDay].fundsToUse)
+            const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
+            console.log(fundsToUseBasedOnPositionType)
+            return fundsToUseBasedOnPositionType
+        }
     }
 
     // ------------------| Functions END  |------------------
@@ -267,7 +275,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     if (!user) return <div>Loading...</div>
     return (
         <>
-            <div>Trade Setting</div>
+            <div>Trade Settings</div>
             <div className={css.newTradeSettingsWidget}>
                 <div className={css.newTradeSettingsLeftChild}>
                     <Selector label={"Position Type"} itemsList={positionTypes} selectionChanged={(item: any) => setPositionType(item)} />

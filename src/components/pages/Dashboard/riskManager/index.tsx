@@ -7,10 +7,10 @@ import ToggleSwitch from "../../../ToggleSwitch"
 import css from "./style.module.css"
 
 interface riskManager {
-    numberOfTradesAllowedPerDay: number,
-    takeControlOfManualTrades: boolean,
-    percentageOfMaxProfitPerDay: number,
-    percentageOfMaxLossPerDay: number,
+    numberOfTradesAllowedPerDay: number
+    takeControlOfManualTrades: boolean
+    percentageOfMaxProfitPerDay: number
+    percentageOfMaxLossPerDay: number
 }
 export default function RiskManager() {
     const [riskManager, setRiskManager] = useState<riskManager>({
@@ -64,7 +64,8 @@ export default function RiskManager() {
             .then((data) => {
                 setSaved(true)
                 showToast("Settings Saved", "success")
-            }).catch((err) => {
+            })
+            .catch((err) => {
                 showToast("Error Saving Settings", "error")
             })
     }
@@ -88,9 +89,21 @@ export default function RiskManager() {
                 <a>Take Control of manual trades: </a>
                 <ToggleSwitch currentState={riskManager.takeControlOfManualTrades} onStateChange={onTakeControlOfManualTradesChange} />
                 <div className="margin-top" />
-                <NumberInput placeholder="Trades allowed per day" onChange={onNumberOfTradesAllowedPerDayChange} incrementalValue={1} maxValue={0} startValue={riskManager.numberOfTradesAllowedPerDay} />
+                <NumberInput
+                    placeholder="Trades allowed per day"
+                    onChange={onNumberOfTradesAllowedPerDayChange}
+                    incrementalValue={1}
+                    maxValue={0}
+                    startValue={riskManager.numberOfTradesAllowedPerDay}
+                />
                 <div className="margin-top" />
-                <NumberInput placeholder="%age of max profit per day" onChange={onPercentageOfMaxProfitPerDayChange} incrementalValue={1} maxValue={0} startValue={riskManager.percentageOfMaxProfitPerDay} />
+                <NumberInput
+                    placeholder="%age of max profit per day"
+                    onChange={onPercentageOfMaxProfitPerDayChange}
+                    incrementalValue={1}
+                    maxValue={0}
+                    startValue={riskManager.percentageOfMaxProfitPerDay}
+                />
                 <div className="margin-top" />
                 <NumberInput placeholder="%age of max loss per day" onChange={onPercentageOfMaxLossPerDayChange} incrementalValue={1} maxValue={0} startValue={riskManager.percentageOfMaxLossPerDay} />
                 <div className="margin-top" />

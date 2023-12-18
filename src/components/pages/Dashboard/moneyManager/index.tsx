@@ -51,7 +51,7 @@ export default function MoneyManager() {
             return { ...prev, mode: _fundsToUseMode }
         })
         if (_fundsToUseMode == "percentage") {
-            //calculate percentage of funds to use 
+            //calculate percentage of funds to use
             setMoneyManager((prev: any) => {
                 return { ...prev, percentageOfFundsToUse: ((moneyManager.fundsToUse / funds.available) * 100).toFixed(0) }
             })
@@ -80,7 +80,6 @@ export default function MoneyManager() {
                 return { ...prev, fundsToUse: value }
             })
         }
-
     }
 
     function onPreferredOptionPriceChange(positionType: string, value: number) {
@@ -122,7 +121,8 @@ export default function MoneyManager() {
             .then((data) => {
                 setSaved(true)
                 showToast("Settings Saved", "success")
-            }).catch((err) => {
+            })
+            .catch((err) => {
                 showToast("Error Saving Settings", "error")
             })
     }
