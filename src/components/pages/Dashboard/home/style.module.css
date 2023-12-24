@@ -1,0 +1,48 @@
+/* styles/module.css */
+
+.container {
+  background-color: #131113;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.widgetContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.widget {
+  background-color: #1a191a;
+  padding: 20px;
+  border: 1px solid #00a6ed;
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.glassEffect {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.backgroundBall {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background-color: #00a6ed;
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+  z-index: -1;
+}
+
+
+
+
+/* Add other styles based on your requirements using the provided color variables */

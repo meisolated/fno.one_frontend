@@ -140,7 +140,7 @@ export default function Dashboard(props: any) {
             </Head>
             {positions.length > 0 && (
                 <DraggableWidget title="Positions" closable={true}>
-                    <PositionsWidget positions={positions} />
+                    <PositionsWidget positions={positions} marketData={marketData} />
                 </DraggableWidget>
             )}
             <div className={css.dashboard}>
@@ -294,7 +294,7 @@ export default function Dashboard(props: any) {
     )
 }
 
-const PositionsWidget = ({ positions }: any) => {
+const PositionsWidget = ({ positions, marketData }: any) => {
     return (
         <div className={css.positionsWrapper}>
             <div className={css.positionsHeader}>
@@ -307,17 +307,24 @@ const PositionsWidget = ({ positions }: any) => {
 
             {positions.length > 0 &&
                 positions.map((position: any, i: any) => {
+                    const PnL = (
+                        position.side == 1
+                            ? marketData[position.trueDataSymbol]
+                                ? marketData[position.trueDataSymbol].lp - position.price
+                                : 0
+                            : position.price - (marketData[position.trueDataSymbol] ? marketData[position.trueDataSymbol].lp : 0)
+                    ).toFixed(2)
                     return (
                         <div key={i} className={css.position}>
                             <div className={css.positionInfo}>
-                                <div>{position.symbol}di</div>
+                                <div>{position.symbol}</div>
                                 <div>{position.quantity}</div>
                                 <div>{position.price}</div>
                                 <div className={`${position.side == 1 ? badgeCSS.buyBadge : badgeCSS.sellBadge}`}>{position.side == 1 ? "BUY" : "SELL"}</div>
-                                <div>{position.price - position.stopLoss}</div>
+                                <div>{(position.price - position.stopLoss).toFixed(2)}</div>
                             </div>
                             <div className={css.positionStatus}>
-                                <div>PnL: {position.unRealizedProfit}</div>
+                                <div>PnL: {PnL}</div>
                                 <div>{position.status}</div>
                             </div>
                         </div>

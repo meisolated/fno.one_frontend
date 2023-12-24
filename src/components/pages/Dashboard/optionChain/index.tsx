@@ -200,12 +200,10 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         if (user.moneyManager.mode == "percentage") {
             const fundsToUseBasedOnWeekDay = parseFloat(((fundsToUseBasedOnPercentageOfFundsAllocated / 100) * user.moneyManager.weekDays[serverData.todaysDay].percentageOfFundsToUse).toFixed(2))
             const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
-            console.log(fundsToUseBasedOnPositionType)
             return fundsToUseBasedOnPositionType
         } else {
             const fundsToUseBasedOnWeekDay = parseFloat(user.moneyManager.weekDays[serverData.todaysDay].fundsToUse)
             const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
-            console.log(fundsToUseBasedOnPositionType)
             return fundsToUseBasedOnPositionType
         }
     }
