@@ -97,6 +97,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     const [lotSize, setLotSize] = useState<number>(0)
     const [placeOrderButtonState, setPlaceOrderButtonState] = useState<any>(true)
     const [optionPriceToUse, setOptionPriceToUse] = useState<any>(0)
+    const [primeQuantity, setPrimeQuantity] = useState<any>(0)
     const showToast = useToast()
 
     // ------------------| States END  |------------------
@@ -123,9 +124,10 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setStopLoss(value)
     }
 
-    const calculateQuantity = (fundsToUse: any, optionPrice: any) => {
-        const quantity = fundsToUse / optionPrice
-        return Math.floor(quantity / indiesConfig[index].lotSize) * indiesConfig[index].lotSize || 0
+    const calculateQuantity = (quantity: number) => {
+        const _qty = Math.floor(quantity / indiesConfig[index].lotSize) * indiesConfig[index].lotSize + indiesConfig[index].lotSize || 0
+        setQuantity(_qty)
+        return _qty
     }
 
     const onRefreshUpdateTradeInsights = () => {
@@ -136,8 +138,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setClosestOptionStrikeSymbol({ fy: nearestOption.other.fy[callOrPut == 1 ? "CE" : "PE"], trueData: nearestOption[callOrPut == 1 ? "CE" : "PE"] })
         const optionPriceToUse = nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]
         setOptionPriceToUse(optionPriceToUse)
-        const _quantity = calculateQuantity(fundsToUse, optionPriceToUse)
-        setQuantity(_quantity)
+        const _quantity = calculateQuantity(primeQuantity)
         if (_quantity !== 0 && optionPriceToUse !== 0) {
             setFundsRequirement(parseFloat((_quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]).toFixed(2)))
         }
@@ -194,19 +195,6 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
             return nearestOption
         }
     }
-    function fundsAllowedToUse(user: any) {
-        if (serverData.todaysDay == "saturday" || serverData.todaysDay == "sunday") return user.funds.fyers.available || 0
-        const fundsToUseBasedOnPercentageOfFundsAllocated = parseFloat(((user.funds.fyers.available / 100) * user.moneyManager.percentageOfFundsToUse).toFixed(2))
-        if (user.moneyManager.mode == "percentage") {
-            const fundsToUseBasedOnWeekDay = parseFloat(((fundsToUseBasedOnPercentageOfFundsAllocated / 100) * user.moneyManager.weekDays[serverData.todaysDay].percentageOfFundsToUse).toFixed(2))
-            const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
-            return fundsToUseBasedOnPositionType
-        } else {
-            const fundsToUseBasedOnWeekDay = parseFloat(user.moneyManager.weekDays[serverData.todaysDay].fundsToUse)
-            const fundsToUseBasedOnPositionType = parseFloat(((fundsToUseBasedOnWeekDay / 100) * user.positionTypeSettings[positionType].percentageOfFundsToUse).toFixed(2))
-            return fundsToUseBasedOnPositionType
-        }
-    }
 
     // ------------------| Functions END  |------------------
     // ------------------| Button Click Functions  |------------------
@@ -247,6 +235,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     useEffect(() => {
         setLotSize(indiesConfig[index].lotSize)
         onRefreshUpdateTradeInsights()
+
     }, [callOrPut, userOptionPrice, riskToRewardRatio, stopLoss, side, index])
 
     useEffect(() => {
@@ -260,7 +249,8 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setUserOptionPrice(user.positionTypeSettings[positionType]?.preferredOptionPrice)
         setRiskToRewardRatio(parseFloat(user.positionTypeSettings[positionType]?.riskToRewardRatio))
         setStopLoss(parseFloat(user.positionTypeSettings[positionType]?.stopLoss))
-        setFundsToUse(fundsAllowedToUse(user))
+        setFundsToUse(user.moneyManager.fundsToUse)
+        setPrimeQuantity(user.positionTypeSettings[positionType]?.quantity)
     }, [positionType])
 
     useEffect(() => {

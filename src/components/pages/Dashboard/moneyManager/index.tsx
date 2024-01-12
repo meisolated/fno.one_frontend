@@ -11,66 +11,35 @@ import style from "./style.module.css"
 export default function MoneyManager() {
     // ---- State Variables ----
     const [positionType, setPositionType] = useState<any>({
-        long: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
-        scalping: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
-        swing: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
-        expiry: { percentageOfFundsToUse: 0, fundsToUse: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        long: { quantity: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        scalping: { quantity: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        swing: { quantity: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
+        expiry: { quantity: 0, preferredOptionPrice: 0, riskToRewardRatio: 0, stopLoss: 0 },
     })
     const [moneyManager, setMoneyManager] = useState<any>({
-        mode: "percentage",
-        percentageOfFundsToUse: 0,
         fundsToUse: 0,
-        maxLossPerDay: 0,
-        weekDays: {
-            monday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-            tuesday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-            wednesday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-            thursday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-            friday: { percentageOfFundsToUse: 0, fundsToUse: 0 },
-        },
     })
     const [funds, setFunds] = useState<any>({
         available: 0,
         total: 0,
         used: 0,
     })
-    const [riskManager, setRiskManager] = useState<any>({})
-
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)
-    const [weekDaysList, setWeekDaysList] = useState<any>(["monday", "tuesday", "wednesday", "thursday", "friday"])
     const [positionTypesList, setPositionTypesList] = useState<any>(["long", "scalping", "swing", "expiry"])
-    const [currentDay, setCurrentDay] = useState<string>("monday")
     const showToast = useToast()
     // ---- End of State Variables ----
 
-    // ---- Functions ----
-    function onFundsToUseModeChange(newState: boolean) {
-        const _fundsToUseMode = newState ? "percentage" : "amount"
-        setMoneyManager((prev: any) => {
-            return { ...prev, mode: _fundsToUseMode }
-        })
-        if (_fundsToUseMode == "percentage") {
-            //calculate percentage of funds to use
-            setMoneyManager((prev: any) => {
-                return { ...prev, percentageOfFundsToUse: ((moneyManager.fundsToUse / funds.available) * 100).toFixed(0) }
-            })
-        } else {
-            setMoneyManager((prev: any) => {
-                return { ...prev, fundsToUse: ((funds.available * moneyManager.percentageOfFundsToUse) / 100).toFixed(2) }
-            })
-        }
-    }
     function onPositionTypeChange(_positionType: string, value: number) {
         setPositionType((prev: any) => {
             return {
                 ...prev,
-                [_positionType]: { ...positionType[_positionType], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.weekDays[currentDay].fundsToUse * value) / 100).toFixed(2) },
+                [_positionType]: { ...positionType[_positionType], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) },
             }
         })
     }
 
-    async function onPercentageOfFundsToUseChange(value: number) {
+    async function onFundsToUseChange(value: number) {
         if (moneyManager.mode == "percentage") {
             setMoneyManager((prev: any) => {
                 return { ...prev, percentageOfFundsToUse: value, fundsToUse: ((funds.available * value) / 100).toFixed(2) }
@@ -80,6 +49,11 @@ export default function MoneyManager() {
                 return { ...prev, fundsToUse: value }
             })
         }
+    }
+    function onQuantityChange(positionType: string, value: number) {
+        setPositionType((prev: any) => {
+            return { ...prev, [positionType]: { ...prev[positionType], quantity: value } }
+        })
     }
 
     function onPreferredOptionPriceChange(positionType: string, value: number) {
@@ -95,11 +69,6 @@ export default function MoneyManager() {
     function onStopLossChange(positionType: string, value: number) {
         setPositionType((prev: any) => {
             return { ...prev, [positionType]: { ...prev[positionType], stopLoss: value } }
-        })
-    }
-    function onWeekDaysPercentageOfFundsToUseChange(day: string, value: number) {
-        setMoneyManager((prev: any) => {
-            return { ...prev, weekDays: { ...prev.weekDays, [day]: { ...prev.weekDays[day], percentageOfFundsToUse: value, fundsToUse: ((moneyManager.fundsToUse * value) / 100).toFixed(2) } } }
         })
     }
 
@@ -143,12 +112,7 @@ export default function MoneyManager() {
         positionTypesList.map((item: any, index: number) => {
             return onPositionTypeChange(item.toLowerCase(), positionType[item.toLowerCase()].percentageOfFundsToUse)
         })
-    }, [moneyManager, currentDay])
-    useEffect(() => {
-        weekDaysList.map((item: any, index: number) => {
-            return onWeekDaysPercentageOfFundsToUseChange(item.toLowerCase(), moneyManager.weekDays[item.toLowerCase()].percentageOfFundsToUse)
-        })
-    }, [moneyManager.percentageOfFundsToUse, moneyManager.fundsToUse])
+    }, [moneyManager])
 
     useEffect(() => {
         setIsLoading(true)
@@ -162,7 +126,6 @@ export default function MoneyManager() {
         fetch("/internalApi/serverData")
             .then((res) => res.json())
             .then(({ data }) => {
-                setWeekDaysList(data.weekDays)
                 setPositionTypesList(data.positionTypesList)
             })
         setTimeout(() => {
@@ -177,8 +140,6 @@ export default function MoneyManager() {
             <Head>
                 <title>Settings</title>
             </Head>
-            {/* <h1>Settings</h1> */}
-            <Selector label="Select Day" itemsList={weekDaysList} selectionChanged={(e: any) => setCurrentDay(e)} />
             <div className={style.settingsGrid}>
                 <div className={style.settingsGridItem}>
                     <h2>Position Type Settings</h2>
@@ -189,12 +150,13 @@ export default function MoneyManager() {
                                     <div className="text-center full-width underline">
                                         <a>{capitalizeFirstLetter(item)} Position</a>
                                     </div>
+
                                     <NumberInput
-                                        placeholder={`Percentage % [₹ ${positionType[item.toLowerCase()].fundsToUse}]`}
-                                        onChange={(value: any) => onPositionTypeChange(item.toLowerCase(), value)}
+                                        placeholder={`Quantity`}
+                                        onChange={(value: any) => onQuantityChange(item.toLowerCase(), value)}
                                         incrementalValue={5}
-                                        maxValue={100}
-                                        startValue={positionType[item.toLowerCase()].percentageOfFundsToUse}
+                                        maxValue={900}
+                                        startValue={positionType[item.toLowerCase()].quantity}
                                     />
                                     <TextInput
                                         placeholder={`Preferred Option Price`}
@@ -226,23 +188,16 @@ export default function MoneyManager() {
                 </div>
                 <div className={style.settingsGridItem}>
                     <h2>Money Manager</h2>
-                    <a>{moneyManager.mode == "percentage" ? "Percentage" : "Amount"} of Funds Allocated</a>
+                    <a>Amount of Funds Allocated</a>
                     <div className="margin-top" />
-                    <ToggleSwitch currentState={moneyManager.mode == "percentage" ? true : false} onStateChange={onFundsToUseModeChange} />
-                    <div className="margin-top" />
-                    <NumberInput
-                        placeholder={`${moneyManager.mode == "percentage" ? `Percentage %  [₹ ${moneyManager.fundsToUse}]` : `Amount`}`}
-                        onChange={(value: any) => onPercentageOfFundsToUseChange(value)}
-                        incrementalValue={5}
-                        maxValue={moneyManager.mode == "percentage" ? 100 : funds.available}
-                        startValue={moneyManager.mode == "percentage" ? moneyManager.percentageOfFundsToUse : moneyManager.fundsToUse}
-                    />
+                    {/* <ToggleSwitch currentState={moneyManager.mode == "percentage" ? true : false} onStateChange={onFundsToUseModeChange} /> */}
+                    <NumberInput placeholder={`Amount`} onChange={(value: any) => onFundsToUseChange(value)} incrementalValue={5} maxValue={funds.available} startValue={moneyManager.fundsToUse} />
                     <div className="margin-top" />
                     {/* <div className="margin-top" /> */}
                     <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>
                         {saved ? "SAVED" : "SAVE"}
                     </div>
-                    <div className="margin-top" />
+                    {/* <div className="margin-top" />
                     <h2>Week Days Settings</h2>
                     <div>Percentage of Funds to Use (FTU) based on week day</div>
                     {weekDaysList.map((item: any, index: number) => {
@@ -261,7 +216,7 @@ export default function MoneyManager() {
                     <div className="margin-top" />
                     <div className={`smallButton ${saved && "disabledButton"}`} onClick={onPositionTypeSaveButtonClicked}>
                         {saved ? "SAVED" : "SAVE"}
-                    </div>
+                    </div> */}
                 </div>
                 <div className={style.settingsGridItem}>
                     <h2>Funds Details </h2>

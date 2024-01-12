@@ -8,6 +8,7 @@ import Loading from "../../components/Loading"
 import NotificationSender from "../../components/Notification/notificationSender"
 import NotificationComponent from "../../components/Notification/requestNotificationPermission"
 import Alerts from "../../components/pages/Dashboard/alerts"
+import Crypto from "../../components/pages/Dashboard/crypto"
 import Home from "../../components/pages/Dashboard/home"
 import Logs from "../../components/pages/Dashboard/logs"
 import MoneyManager from "../../components/pages/Dashboard/moneyManager"
@@ -17,6 +18,7 @@ import Positions from "../../components/pages/Dashboard/positions"
 import RiskManager from "../../components/pages/Dashboard/riskManager"
 import ServerSettings from "../../components/pages/Dashboard/serverSettings"
 import Trades from "../../components/pages/Dashboard/trades"
+import PositionWidget from "../../components/pages/Global/PositionsWidget"
 import PublicWebsocket from "../../websocket/public.websocket"
 import UserWebsocket from "../../websocket/user.websocket"
 import css from "./style.module.css"
@@ -37,7 +39,10 @@ export default function Dashboard(props: any) {
     const [indiesConfig, setIndiesConfig] = useState<any>({})
     const [isTodayHoliday, setIsTodayHoliday] = useState(false)
     const [isTomorrowHoliday, setIsTomorrowHoliday] = useState(false)
-    const [positions, setPositions] = useState<any>([])
+    const [positionsData, setPositionsData] = useState<any>({
+        positions: [],
+        totalPointsCaptured: 0,
+    })
 
     const [connectedSockets, setConnectedSockets] = useState<any>({
         user: false,
@@ -52,6 +57,8 @@ export default function Dashboard(props: any) {
         setActive(e)
         router.push(`/dashboard/${e}`)
     }
+
+
 
     useEffect(() => {
         const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs, setConnectedSockets)
@@ -75,16 +82,8 @@ export default function Dashboard(props: any) {
                 return { ...prev, [indiesConfig[index].name]: marketData[indiesConfig[index].name].lp }
             })
         })
-        // setOptionChainData((prev: any) => {
-        //     indies.map((index: any, i: any) => {
-        //         const allIndiesOptionChain = prev.allIndiesOptionChain[index].forEach((option: any) => {
-        //             return { ...option, PE_LTP: marketData[option.PE], CE_LTP: marketData[option.CE] }
-        //         })
-        //         console.log(allIndiesOptionChain)
-        //         return { ...prev, allIndiesOptionChain: { ...prev.allIndiesOptionChain, [index]: allIndiesOptionChain } }
-        //     })
-        // })
     }, [marketData])
+
 
     useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
@@ -106,7 +105,7 @@ export default function Dashboard(props: any) {
             setIsTodayHoliday(_userDataJson.data.todayHoliday)
             setIsTomorrowHoliday(_userDataJson.data.tomorrowHoliday)
             setUser(_userDataJson.data)
-            setPositions(_positionsDataJson.data)
+            setPositionsData(_positionsDataJson.data)
             await fetch("/api/optionChain")
                 .then((res) => res.json())
                 .then((d: any) => {
@@ -127,6 +126,15 @@ export default function Dashboard(props: any) {
         }
     }, [])
     useEffect(() => {
+        setInterval(async () => {
+            const _positionsData = await fetch("/internalApi/user/getPositions")
+            const _positionsDataJson = await _positionsData.json()
+            if (!_positionsDataJson) return
+            if (_positionsDataJson.data.positions.length == 0) return
+            setPositionsData(_positionsDataJson.data)
+        }, 2000)
+    }, [])
+    useEffect(() => {
         setInterval(() => {
             setCurrentTime(new Date().toLocaleTimeString())
         }, 500)
@@ -138,9 +146,9 @@ export default function Dashboard(props: any) {
                 <meta name="google" content="notranslate" />
                 <meta name="google" content="nositelinkssearchbox" key="sitelinks" />
             </Head>
-            {positions.length > 0 && (
+            {positionsData.positions.length > 0 && (
                 <DraggableWidget title="Positions" closable={true}>
-                    <PositionsWidget positions={positions} marketData={marketData} />
+                    <PositionWidget positionsData={positionsData} marketData={marketData} />
                 </DraggableWidget>
             )}
             <div className={css.dashboard}>
@@ -178,7 +186,13 @@ export default function Dashboard(props: any) {
                             <div className={css.navbar_vertical_item_icon}>
                                 <div className="material-symbols-rounded ">link</div>
                             </div>
-                            <div className={css.navbar_vertical_item_text}>Option Chain</div>
+                            <div className={css.navbar_vertical_item_text}>Option Chain &quot;IN&quot;</div>
+                        </div>
+                        <div className={`${css.navbar_vertical_item} ${active == "crypto" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("crypto")}>
+                            <div className={css.navbar_vertical_item_icon}>
+                                <div className="material-symbols-rounded ">currency_bitcoin</div>
+                            </div>
+                            <div className={css.navbar_vertical_item_text}>Crypto</div>
                         </div>
                         <div className={`${css.navbar_vertical_item} ${active == "alerts" && css.active_navbar_item}`} onClick={() => onNavbarItemClick("alerts")}>
                             <div className={css.navbar_vertical_item_icon}>
@@ -264,6 +278,7 @@ export default function Dashboard(props: any) {
                         {active == "moneyManager" && <MoneyManager />}
                         {active == "riskManager" && <RiskManager />}
                         {active == "serverSettings" && <ServerSettings />}
+                        {active == "crypto" && <Crypto />}
                         {active == "logs" && <Logs logs={logs} />}
                         <NotificationComponent />
                         <NotificationSender />
@@ -291,46 +306,6 @@ export default function Dashboard(props: any) {
                 )
             )}
         </>
-    )
-}
-
-const PositionsWidget = ({ positions, marketData }: any) => {
-    return (
-        <div className={css.positionsWrapper}>
-            <div className={css.positionsHeader}>
-                <div>SYMBOL</div>
-                <div>QUANTITY</div>
-                <div>BUY AVG</div>
-                <div>SIDE</div>
-                <div>STOP LOSS</div>
-            </div>
-
-            {positions.length > 0 &&
-                positions.map((position: any, i: any) => {
-                    const PnL = (
-                        position.side == 1
-                            ? marketData[position.trueDataSymbol]
-                                ? marketData[position.trueDataSymbol].lp - position.price
-                                : 0
-                            : position.price - (marketData[position.trueDataSymbol] ? marketData[position.trueDataSymbol].lp : 0)
-                    ).toFixed(2)
-                    return (
-                        <div key={i} className={css.position}>
-                            <div className={css.positionInfo}>
-                                <div>{position.symbol}</div>
-                                <div>{position.quantity}</div>
-                                <div>{position.price}</div>
-                                <div className={`${position.side == 1 ? badgeCSS.buyBadge : badgeCSS.sellBadge}`}>{position.side == 1 ? "BUY" : "SELL"}</div>
-                                <div>{(position.price - position.stopLoss).toFixed(2)}</div>
-                            </div>
-                            <div className={css.positionStatus}>
-                                <div>PnL: {PnL}</div>
-                                <div>{position.status}</div>
-                            </div>
-                        </div>
-                    )
-                })}
-        </div>
     )
 }
 

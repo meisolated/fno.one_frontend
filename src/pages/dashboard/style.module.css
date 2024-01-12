@@ -422,3 +422,43 @@
 .position:hover {
     background-color: #2B2B2B;
 }
+
+.backgroundRed {
+    background-color: var(--red-dark);
+    padding: 0px 5px;
+    border-radius: 5px;
+}
+
+.backgroundGreen {
+    background-color: var(--green-dark);
+    padding: 0px 5px;
+    border-radius: 5px;
+}
+
+.positionsFooter {
+    width: 100%;
+    height: fit-content;
+    padding-top: 5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-top: 1px solid #2B2B2B;
+    color: #ffff;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--sidebar-color);
+}
+
+.positionsFooterTotalPointsCaptured {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 5px;
+    color: #ffff;
+    font-size: 14px !important;
+}
