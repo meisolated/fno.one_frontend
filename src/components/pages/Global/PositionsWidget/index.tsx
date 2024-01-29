@@ -56,6 +56,7 @@ export default function PositionWidget({ positionsData, marketData }: any) {
                                 </div>
                                 <div>{position.status == "exitPositionOrderFilled" ? "CLOSED" : position.status}</div>
                             </div>
+
                             <div className={`${css.positionActions} ${!positionActions[position.id] && css.positionActionsHide}`}>
                                 <div className={css.positionAction}>
                                     <div className="material-symbols-rounded">close</div>
@@ -64,6 +65,11 @@ export default function PositionWidget({ positionsData, marketData }: any) {
                                 <div className={css.positionAction}>
                                     <div className="material-symbols-rounded">switch_access_shortcut</div>
                                     Trial StopLoss
+                                </div>
+                                <div className={css.positionAction}>
+                                    Buy Average Price : {position.buyAveragePrice != 0 ? position.buyAveragePrice : 0}
+                                    <br />
+                                    Sell Average Price : {position.sellAveragePrice != 0 ? position.sellAveragePrice : 0}
                                 </div>
                             </div>
                         </div>

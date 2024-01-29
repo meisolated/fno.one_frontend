@@ -10,13 +10,14 @@ import css from "./style.module.css"
 
 interface props {
     marketData: any
+    differenceData: any
     optionChainData: any
     user: any
     indexLTP: any
     serverData: any
 }
 
-export default function OptionChain({ marketData, optionChainData, user, indexLTP, serverData }: props) {
+export default function OptionChain({ marketData, differenceData, optionChainData, user, indexLTP, serverData }: props) {
     // const indies = ["BANKNIFTY", "NIFTY", "FINNIFTY"]
     const [isLoading, setLoading] = useState(true)
     const [optionChain, setCurrentOptionChain] = useState<any>([])
@@ -69,7 +70,7 @@ export default function OptionChain({ marketData, optionChainData, user, indexLT
                     />
                     <Selector label={"Switch Index"} itemsList={indies} selectionChanged={(item: any) => onIndexChange(item)} />
 
-                    <OptionChainWidget optionChain={optionChain} marketData={marketData} ATMStrikePrice={ATMStrikePrice} />
+                    <OptionChainWidget optionChain={optionChain} differenceData={differenceData} marketData={marketData} ATMStrikePrice={ATMStrikePrice} />
                 </div>
             </div>
         </div>
@@ -138,7 +139,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setClosestOptionStrikeSymbol({ fy: nearestOption.other.fy[callOrPut == 1 ? "CE" : "PE"], trueData: nearestOption[callOrPut == 1 ? "CE" : "PE"] })
         const optionPriceToUse = nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]
         setOptionPriceToUse(optionPriceToUse)
-        const _quantity = calculateQuantity(primeQuantity)
+        const _quantity = quantity // calculateQuantity(primeQuantity)
         if (_quantity !== 0 && optionPriceToUse !== 0) {
             setFundsRequirement(parseFloat((_quantity * nearestOption[`${callOrPut == 1 ? "CE" : "PE"}_LTP`]).toFixed(2)))
         }
@@ -235,9 +236,12 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     useEffect(() => {
         setLotSize(indiesConfig[index].lotSize)
         onRefreshUpdateTradeInsights()
+        console.log("refreshing")
+    }, [callOrPut, userOptionPrice, riskToRewardRatio, stopLoss, side, index, quantity])
 
-    }, [callOrPut, userOptionPrice, riskToRewardRatio, stopLoss, side, index])
-
+    useEffect(() => {
+        calculateQuantity(user.positionTypeSettings[positionType]?.quantity)
+    }, [index])
     useEffect(() => {
         if (!user.serverData.positionTypes) return
         const positionTypes = Object.keys(user.serverData.positionTypes)
@@ -251,6 +255,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         setStopLoss(parseFloat(user.positionTypeSettings[positionType]?.stopLoss))
         setFundsToUse(user.moneyManager.fundsToUse)
         setPrimeQuantity(user.positionTypeSettings[positionType]?.quantity)
+        calculateQuantity(user.positionTypeSettings[positionType]?.quantity)
     }, [positionType])
 
     useEffect(() => {
@@ -299,7 +304,7 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
     )
 }
 
-const OptionChainWidget = ({ optionChain, marketData, ATMStrikePrice }: any) => {
+const OptionChainWidget = ({ optionChain, differenceData, marketData, ATMStrikePrice }: any) => {
     const [_ATMStrikePrice, setATMStrikePrice] = useState<any>([])
 
     useEffect(() => {
@@ -311,7 +316,9 @@ const OptionChainWidget = ({ optionChain, marketData, ATMStrikePrice }: any) => 
             <thead>
                 <tr>
                     <th>CE</th>
+                    <th>Difference</th>
                     <th>STRIKE PRICE</th>
+                    <th>Difference</th>
                     <th>PE</th>
                 </tr>
             </thead>
@@ -321,7 +328,9 @@ const OptionChainWidget = ({ optionChain, marketData, ATMStrikePrice }: any) => 
                         return (
                             <tr key={index} className={_ATMStrikePrice.includes(option.CE || option.PE) ? css.ATMStrikePriceAlteration : ""}>
                                 <td>{marketData[option.CE] ? marketData[option.CE].lp : option.CE_LTP}</td>
+                                <td>{differenceData[option.CE] ? differenceData[option.CE].difference : 0}</td>
                                 <td>{option.strike}</td>
+                                <td>{differenceData[option.PE] ? differenceData[option.PE].difference : 0}</td>
                                 <td>{marketData[option.PE] ? marketData[option.PE].lp : option.PE_LTP}</td>
                             </tr>
                         )

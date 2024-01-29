@@ -250,7 +250,7 @@
 
 /* RIGHT SIDE CURRENT MARKET LTP */
 .content_header_right_index_current_price {
-    width: 230px;
+    width: fit-content;
     border: 1px solid white;
     padding: 0 5px;
     border-radius: 5px;

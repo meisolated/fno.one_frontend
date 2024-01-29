@@ -32,6 +32,7 @@ export default function Dashboard(props: any) {
     const [serverData, setServerData] = useState<any>({})
     const [logs, setLogs] = useState<Array<string>>([])
     const [marketData, setMarketData] = useState<any>({})
+    const [differenceData, setDifferenceData] = useState<any>({})
     const [optionChainData, setOptionChainData] = useState<any>({})
     const [currentTime, setCurrentTime] = useState("")
     const [indexLTP, setIndexLTP] = useState<any>({})
@@ -61,7 +62,7 @@ export default function Dashboard(props: any) {
 
 
     useEffect(() => {
-        const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setLogs, setConnectedSockets)
+        const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setDifferenceData, setLogs, setConnectedSockets)
         const userWebsocket = new UserWebsocket(props.token, setLogs, setConnectedSockets)
         publicWebSocket.connect()
         userWebsocket.connect()
@@ -244,9 +245,10 @@ export default function Dashboard(props: any) {
                                 FIN NIFTY : 3333.3 <br /> */}
                                 {!loading &&
                                     indies.map((index: any, i: any) => {
+                                        const difference = differenceData[indiesConfig[index].name] ? differenceData[indiesConfig[index].name].difference : 0
                                         return (
                                             <div key={i}>
-                                                {indiesConfig[index].name}: {indexLTP[indiesConfig[index].name]} <br />
+                                                {indiesConfig[index].name}: {indexLTP[indiesConfig[index].name]} | {difference} <br />
                                             </div>
                                         )
                                     })}
@@ -273,7 +275,7 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "optionChain" && <OptionChain marketData={marketData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />}
+                        {active == "optionChain" && <OptionChain marketData={marketData} differenceData={differenceData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />}
                         {active == "alerts" && <Alerts marketData={marketData} indexLTP={indexLTP} />}
                         {active == "moneyManager" && <MoneyManager />}
                         {active == "riskManager" && <RiskManager />}

@@ -26,7 +26,7 @@ export default function MoneyManager() {
     })
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [saved, setSaved] = useState<boolean>(false)
-    const [positionTypesList, setPositionTypesList] = useState<any>(["long", "scalping", "swing", "expiry"])
+    const [positionTypesList, setPositionTypesList] = useState<any>([])
     const showToast = useToast()
     // ---- End of State Variables ----
 
