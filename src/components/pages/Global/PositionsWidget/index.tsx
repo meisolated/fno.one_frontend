@@ -39,7 +39,6 @@ export default function PositionWidget({ positionsData, marketData }: any) {
                     ).toFixed(2))
                     const ProfitAndLossInPoints: number = position.sellAveragePrice != 0 || position.buyAveragePrice != 0 ? parseFloat((position.side == 1 ? position.sellAveragePrice - position.buyAveragePrice : position.buyAveragePrice - position.sellAveragePrice).toFixed(2)) : onGoingProfitAndLossIsTradeIsActive
                     const ProfitAndLoss: number = parseFloat((ProfitAndLossInPoints * position.quantity).toFixed(2))
-
                     return (
                         <div key={i} className={css.position} onClick={() => togglePositionActions(position.id)} >
                             <div className={css.positionInfo}>
