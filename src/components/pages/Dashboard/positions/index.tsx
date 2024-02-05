@@ -41,7 +41,6 @@ export default function Positions() {
             const positionYear = date.getFullYear()
             const day = daysList[date.getDay()]
             filteredPositionsList[`${day}, ${positionDate} ${months[positionMonth]} ${positionYear}`] = position
-
         })
         return filteredPositionsList
     }
@@ -50,7 +49,7 @@ export default function Positions() {
         fetch("/internalApi/user/getAllPositions")
             .then((res) => res.json())
             .then((data) => {
-                const filteredData = data.data//.filter((position: any) => position.quantity !== 0 && position.buyAveragePrice !== 0 && position.sellAveragePrice !== 0)
+                const filteredData = data.data //.filter((position: any) => position.quantity !== 0 && position.buyAveragePrice !== 0 && position.sellAveragePrice !== 0)
                 setPositionsList(filteredData)
                 setFilteredPositionsList(filteredData)
                 setTotalProfitOrLoss(_totalProfitOrLoss(filteredData))

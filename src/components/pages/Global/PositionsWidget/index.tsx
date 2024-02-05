@@ -9,7 +9,7 @@ export default function PositionWidget({ positionsData, marketData }: any) {
     function togglePositionActions(positionId: string) {
         setPositionActions({
             ...positionActions,
-            [positionId]: !positionActions[positionId]
+            [positionId]: !positionActions[positionId],
         })
     }
 
@@ -30,17 +30,21 @@ export default function PositionWidget({ positionsData, marketData }: any) {
 
             {positionsData.positions.length > 0 &&
                 positionsData.positions.map((position: any, i: any) => {
-                    const onGoingProfitAndLossIsTradeIsActive = parseFloat((
-                        position.side == 1
+                    const onGoingProfitAndLossIsTradeIsActive = parseFloat(
+                        (position.side == 1
                             ? marketData[position.trueDataSymbol]
                                 ? marketData[position.trueDataSymbol].lp - position.price
                                 : 0
                             : position.price - (marketData[position.trueDataSymbol] ? marketData[position.trueDataSymbol].lp : 0)
-                    ).toFixed(2))
-                    const ProfitAndLossInPoints: number = position.sellAveragePrice != 0 || position.buyAveragePrice != 0 ? parseFloat((position.side == 1 ? position.sellAveragePrice - position.buyAveragePrice : position.buyAveragePrice - position.sellAveragePrice).toFixed(2)) : onGoingProfitAndLossIsTradeIsActive
+                        ).toFixed(2)
+                    )
+                    const ProfitAndLossInPoints: number =
+                        position.sellAveragePrice != 0 || position.buyAveragePrice != 0
+                            ? parseFloat((position.side == 1 ? position.sellAveragePrice - position.buyAveragePrice : position.buyAveragePrice - position.sellAveragePrice).toFixed(2))
+                            : onGoingProfitAndLossIsTradeIsActive
                     const ProfitAndLoss: number = parseFloat((ProfitAndLossInPoints * position.quantity).toFixed(2))
                     return (
-                        <div key={i} className={css.position} onClick={() => togglePositionActions(position.id)} >
+                        <div key={i} className={css.position} onClick={() => togglePositionActions(position.id)}>
                             <div className={css.positionInfo}>
                                 <div>{position.symbol}</div>
                                 <div>{position.quantity}</div>
@@ -50,7 +54,9 @@ export default function PositionWidget({ positionsData, marketData }: any) {
                             </div>
                             <div className={css.positionStatus}>
                                 <div className="flex-direction">
-                                    <div className={`${ProfitAndLossInPoints < 0 ? css.backgroundRed : css.backgroundGreen}`}>PnL: {ProfitAndLossInPoints} [{ProfitAndLoss}]</div>
+                                    <div className={`${ProfitAndLossInPoints < 0 ? css.backgroundRed : css.backgroundGreen}`}>
+                                        PnL: {ProfitAndLossInPoints} [{ProfitAndLoss}]
+                                    </div>
                                     <div>&nbsp;|&nbsp;({onGoingProfitAndLossIsTradeIsActive})</div>
                                 </div>
                                 <div>{position.status == "exitPositionOrderFilled" ? "CLOSED" : position.status}</div>
@@ -77,7 +83,9 @@ export default function PositionWidget({ positionsData, marketData }: any) {
             <div className={css.positionsFooter}>
                 <div className={css.positionsFooterTotalPointsCaptured}>
                     <div>Total Points Captured</div>
-                    <div className={`${totalPointsCaptured > 0 ? css.backgroundGreen : css.backgroundRed}`}>{totalPointsCaptured} | {totalProfitAndLoss}</div>
+                    <div className={`${totalPointsCaptured > 0 ? css.backgroundGreen : css.backgroundRed}`}>
+                        {totalPointsCaptured} | {totalProfitAndLoss}
+                    </div>
                 </div>
             </div>
         </div>

@@ -59,8 +59,6 @@ export default function Dashboard(props: any) {
         router.push(`/dashboard/${e}`)
     }
 
-
-
     useEffect(() => {
         const publicWebSocket = new PublicWebsocket(props.token, setMarketData, setDifferenceData, setLogs, setConnectedSockets)
         const userWebsocket = new UserWebsocket(props.token, setLogs, setConnectedSockets)
@@ -84,7 +82,6 @@ export default function Dashboard(props: any) {
             })
         })
     }, [marketData])
-
 
     useEffect(() => {
         setNavbar(JSON.parse(localStorage.getItem("navbar") || "false"))
@@ -275,7 +272,9 @@ export default function Dashboard(props: any) {
                         {active == "trades" && <Trades />}
                         {active == "orders" && <Orders />}
                         {active == "positions" && <Positions />}
-                        {active == "optionChain" && <OptionChain marketData={marketData} differenceData={differenceData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />}
+                        {active == "optionChain" && (
+                            <OptionChain marketData={marketData} differenceData={differenceData} optionChainData={optionChainData} user={user} indexLTP={indexLTP} serverData={serverData} />
+                        )}
                         {active == "alerts" && <Alerts marketData={marketData} indexLTP={indexLTP} />}
                         {active == "moneyManager" && <MoneyManager />}
                         {active == "riskManager" && <RiskManager />}

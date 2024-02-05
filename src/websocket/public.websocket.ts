@@ -64,7 +64,6 @@ export default class PublicWebsocket {
             const symbol = parsedData.symbol
             this.setDifference((differenceData: any) => {
                 return { ...differenceData, [symbol]: parsedData }
-
             })
         })
     }
