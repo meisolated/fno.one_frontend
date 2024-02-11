@@ -1,6 +1,6 @@
 import Head from "next/head"
 import { useEffect, useState } from "react"
-import { roundToNearestMultiple } from "../../../../helper"
+import { playAlertSound, playErrorSound, playSuccessSound, roundToNearestMultiple } from "../../../../helper"
 import NumberInput from "../../../Input/Number"
 import Loading from "../../../Loading"
 import Selector from "../../../Selector"
@@ -225,7 +225,9 @@ const NewTradeSettingsWidget = ({ currentExpiryOptionChain, marketData, indiesCo
         const sendOrderRes = await sendOrderReq.json()
         if (sendOrderRes.code == 200) {
             showToast(sendOrderRes.message, "success")
+            playSuccessSound()
         } else {
+            playErrorSound()
             showToast(sendOrderRes.message, "error")
         }
         setTimeout(() => setPlaceOrderButtonState(true), 10000)

@@ -1,24 +1,33 @@
 import io from "socket.io-client"
-import { playSound, playThisSound } from "../helper"
+import { playAlertSound, playSound, playThisSound } from "../helper"
 import * as log from "../helper/consoleLog"
 
+const soundsUrl = "https://fno.one/sounds/"
+
 const audios = {
-    positionClosedWithStopLoss: "https://fno.one/sounds/position_closed_with_stop_loss.mp3",
-    orderPlaced: "https://fno.one/sounds/order_placed.mp3",
-    orderPartiallyFilled: "https://fno.one/sounds/order_partially_filled.mp3",
-    orderFilled: "https://fno.one/sounds/order_filled.mp3",
-    trailingStopLoss: "https://fno.one/sounds/trailing_stop_loss.mp3",
-    positionClosedWithTarget: "https://fno.one/sounds/position_closed_with_target.mp3",
-    positionRejectedByMoneyManager: "https://fno.one/sounds/position_rejected_by_money_manager.mp3",
-    positionRejectedByRiskManager: "https://fno.one/sounds/position_rejected_by_risk_manager.mp3",
-    positionApprovedByMoneyManager: "https://fno.one/sounds/position_approved_by_money_manager.mp3",
-    positionApprovedByRiskManager: "https://fno.one/sounds/position_approved_by_risk_manager.mp3",
-    positionApproved: "https://fno.one/sounds/approved.mp3",
-    orderFailed: "https://fno.one/sounds/order_failed.mp3",
-    orderRejected: "https://fno.one/sounds/order_rejected.mp3",
-    modificationDoneByRiskManager: "https://fno.one/sounds/modification_done_by_risk_manager.mp3",
-    positionClosed: "https://fno.one/sounds/position_closed.mp3",
-    positionClosedManually: "https://fno.one/sounds/position_closed_manually.mp3",
+    positionClosedWithStopLoss: soundsUrl + "position_closed_with_stop_loss.mp3",
+    orderPlaced: soundsUrl + "order_placed.mp3",
+    orderPartiallyFilled: soundsUrl + "order_partially_filled.mp3",
+    orderFilled: soundsUrl + "order_filled.mp3",
+    trailingStopLoss: soundsUrl + "trailing_stop_loss.mp3",
+    positionClosedWithTarget: soundsUrl + "position_closed_with_target.mp3",
+    // ----------------
+    positionRejectedByMoneyManager: soundsUrl + "position_rejected_by_money_manager.mp3",
+    positionRejectedByRiskManager: soundsUrl + "position_rejected_by_risk_manager.mp3",
+    positionApprovedByMoneyManager: soundsUrl + "position_approved_by_money_manager.mp3",
+    positionApprovedByRiskManager: soundsUrl + "position_approved_by_risk_manager.mp3",
+    approvedByRiskManager: soundsUrl + "approved_by_risk_manager.mp3",
+    approvedByMoneyManager: soundsUrl + "approved_by_money_manager.mp3",
+    rejectedByRiskManager: soundsUrl + "rejected_by_risk_manager.mp3", //audio to be added
+    rejectedByMoneyManager: soundsUrl + "rejected_by_money_manager.mp3",//audio to be added
+    // ----------------
+    positionApproved: soundsUrl + "approved.mp3",
+    orderFailed: soundsUrl + "order_failed.mp3",
+    orderRejected: soundsUrl + "order_rejected.mp3",
+    modificationDoneByRiskManager: soundsUrl + "modification_done_by_risk_manager.mp3",
+    positionClosed: soundsUrl + "position_closed.mp3",
+    positionClosedManually: soundsUrl + "position_closed_manually.mp3",
+
 }
 
 /**
@@ -85,6 +94,9 @@ export default class UserWebsocket {
         this.socket.on("marketAlerts", (data: any) => {
             const parsedData = JSON.parse(data)
             console.log(parsedData)
+            if (parsedData.status === "triggered") {
+                playAlertSound()
+            }
         })
         this.socket.on("positionUpdates", (data: any) => {
             const parsedData = JSON.parse(data)
@@ -105,9 +117,9 @@ export default class UserWebsocket {
             } else if (positionStatus.includes("rejectedByRiskManager")) {
                 playThisSound(audios.positionRejectedByRiskManager)
             } else if (positionStatus.includes("approvedByMoneyManager")) {
-                playThisSound(audios.positionApprovedByMoneyManager)
+                playThisSound(audios.approvedByMoneyManager)
             } else if (positionStatus.includes("approvedByRiskManager")) {
-                playThisSound(audios.positionApprovedByRiskManager)
+                playThisSound(audios.approvedByRiskManager)
             } else if (positionStatus.includes("modificationDoneByRiskManager")) {
                 playThisSound(audios.modificationDoneByRiskManager)
             } else if (positionStatus.includes("approved")) {

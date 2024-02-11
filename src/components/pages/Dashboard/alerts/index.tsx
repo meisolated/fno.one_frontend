@@ -1,9 +1,12 @@
 import Head from "next/head"
 import { useEffect, useState } from "react"
+import { playAlertSound, playErrorSound, playSuccessSound } from "../../../../helper"
+import Alert from "../../../Alert"
 import NumberInput from "../../../Input/Number"
 import Loading from "../../../Loading"
 import Selector from "../../../Selector"
 import tableStyle from "../../../Table/style.module.css"
+import { useToast } from "../../../Toast/provider"
 import style from "./style.module.css"
 
 interface props {
@@ -33,6 +36,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
     const [alertsList, setAlertsList] = useState<any>([])
     const [alertValueStartValue, setAlertValueStartValue] = useState(0)
     const [loading, setLoading] = useState(true)
+    const showToast = useToast()
 
     function onAlertPriceChange(_price: any) {
         setAlertPrice(parseFloat(_price))
@@ -54,8 +58,8 @@ export default function Alerts({ marketData, indexLTP }: props) {
     }
     function setAlert() {
         const symbol = symbols.filter((_index: any) => _index.name == currentSymbol)[0].symbol
-        if (alertPrice == 0) return console.log("alertPrice", alertPrice)
-        if (typeof alertPrice != "number") return console.log("alertPrice typeof", typeof alertPrice, alertPrice)
+        if (alertPrice == 0) return showToast("Please enter a valid price", "error")
+        if (typeof alertPrice != "number") return showToast("Please enter a valid price", "error")
         fetch("/internalApi/marketAlerts/create", {
             method: "POST",
             headers: {
@@ -71,6 +75,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
             .then(async (res) => {
                 console.log(res)
                 fetchAlerts()
+                showToast("Alert Set", "success")
             })
             .catch((err) => {
                 console.log(err)
@@ -83,7 +88,7 @@ export default function Alerts({ marketData, indexLTP }: props) {
                 if (json.code == 200) {
                     setAlertsList(json.marketAlerts)
                 } else {
-                    console.log(json)
+                    showToast("Error Fetching Alerts", "error")
                 }
                 setLoading(false)
             })
@@ -102,11 +107,11 @@ export default function Alerts({ marketData, indexLTP }: props) {
             }),
         })
             .then(async (res) => {
-                console.log(res)
+                showToast("Alert Deleted", "success")
                 fetchAlerts()
             })
             .catch((err) => {
-                console.log(err)
+                showToast("Error Deleting Alert", "error")
             })
     }
 

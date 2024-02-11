@@ -144,3 +144,9 @@
     opacity: 0;
     height: 0;
 }
+
+
+.profitAndLossWrapper {
+    float: right;
+    display: flex;
+}

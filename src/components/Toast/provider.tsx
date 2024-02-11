@@ -1,4 +1,5 @@
 import React, { FC, ReactNode, createContext, useContext, useState } from "react"
+import { playErrorSound, playSuccessSound } from "../../helper"
 import css from "./style.module.css"
 interface Toast {
     id: number
@@ -20,6 +21,9 @@ export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
 
     const showToast = (message: string, type: "success" | "error" | "info" | "default") => {
         const id = new Date().getTime()
+        if (type === "success") playSuccessSound()
+        else if (type === "error") playErrorSound()
+
         setToasts((prevToasts) => [
             ...prevToasts,
             {
@@ -50,8 +54,6 @@ export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
 
 export const useToast = (): ((message: string, type: "success" | "error" | "info" | "default") => void) => {
     const context = useContext(ToastContext)
-    if (!context) {
-        throw new Error("useToast must be used within a ToastProvider")
-    }
+    if (!context) throw new Error("useToast must be used within a ToastProvider")
     return context.showToast
 }

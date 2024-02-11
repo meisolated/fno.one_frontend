@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { FaCheckCircle, FaExclamationCircle, FaInfoCircle } from "react-icons/fa"
 import styles from "./style.module.css" // Create a CSS module for styling
 
+
+
 const Alert = ({ position, type, message }: any) => {
     const [isVisible, setIsVisible] = useState(true)
 

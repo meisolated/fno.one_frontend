@@ -83,9 +83,15 @@ export default function PositionWidget({ positionsData, marketData }: any) {
             <div className={css.positionsFooter}>
                 <div className={css.positionsFooterTotalPointsCaptured}>
                     <div>Total Points Captured</div>
-                    <div className={`${totalPointsCaptured > 0 ? css.backgroundGreen : css.backgroundRed}`}>
-                        {totalPointsCaptured} | {totalProfitAndLoss}
+                    <div className={css.profitAndLossWrapper}>
+                        <div className={`${totalPointsCaptured > 0 ? css.backgroundGreen : css.backgroundRed}`}>
+                            [{totalPointsCaptured}]
+                        </div>
+                        <div className={`${totalProfitAndLoss > 0 ? css.backgroundGreen : css.backgroundRed}`}>
+                            [{totalProfitAndLoss}]
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
